@@ -1,6 +1,6 @@
 # IF36 \- Proposition
 
-**Introduction**
+## Introduction
 
 Dans le cadre du projet pour l’UE IF36, “Visualiser des données”, notre groupe utilisera le jeu de données suivant : “Spotify and Youtube, Statistics for the Top 10 songs of various spotify artists and their yt video”. Ce dataset provient du site kaggle.com, et est fait par Salvatore Rastelli, Marco Sallustio et Marco Guarisco. Le dataset a été publié le 7 février 2023, avec les données provenant de 2 sources : Spotify, Youtube.
 
@@ -39,10 +39,10 @@ Ce jeu de données est composé de 20 717 individus, avec 28 features. Le tablea
 
 Le dataset utilisé est complet et ne devrait pas nécessiter de traitement de données particulier avant son utilisation. Cependant, pour l’analyse de données dans le cadre de notre projet, certaines features ne sont pas nécessaires, tel que : 
 
-* Url\_spotify  
-* Uri  
-* Url\_youtube  
-* Description
+* `Url_spotify`
+* `Uri`  
+* `Url_youtube`  
+* `Description`
 
 ## Plan d’analyse
 
