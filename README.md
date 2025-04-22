@@ -9,7 +9,7 @@ Ce jeu de données est composé de 20 717 individus, avec 28 features. Le tablea
 | *Feature*  | *Type* | *Description* |
 | :---- | :---- | :---- |
 | \# | entier | id |
-| Track | string | Nom de la chanson tel qu'affiché sur Spotify. |
+| `Track` | string | Nom de la chanson tel qu'affiché sur Spotify. |
 | Artist | string | Nom de l'artiste. |
 | Url\_spotify | string | Lien URL vers le profil Spotify de l'artiste. |
 | Album | string | Album Spotify contenant la chanson. |
