@@ -1,0 +1,45 @@
+# IF36 \- Proposition
+
+## Introduction
+
+Dans le cadre du projet pour l’UE IF36, “Visualiser des données”, notre groupe utilisera le jeu de données suivant : “Spotify and Youtube, Statistics for the Top 10 songs of various spotify artists and their yt video”. Ce dataset provient du site kaggle.com, et est fait par Salvatore Rastelli, Marco Sallustio et Marco Guarisco. Le dataset a été publié le 7 février 2023, avec les données provenant de 2 sources : Spotify, Youtube.
+
+Ce jeu de données est composé de 20 717 individus, avec 28 features. Le tableau suivant contient chaque feature, type et son description : 
+
+| *Feature*  | *Type* | *Description* |
+| :---- | :---- | :---- |
+| \# | entier | id |
+| `Track` | string | Nom de la chanson tel qu'affiché sur Spotify. |
+| `Artist` | string | Nom de l'artiste. |
+| `Url_spotify` | string | Lien URL vers le profil Spotify de l'artiste. |
+| `Album` | string | Album Spotify contenant la chanson. |
+| `Album_type` | catégorielle | Indique si la chanson est sortie en tant que single, un album, ou autre. |
+| `Uri` | string | Lien Spotify utilisé pour identifier précisément la chanson via l’API Spotify. |
+| `Danceability` | float | Score (0 à 1\) indiquant à quel point la chanson est adaptée à la danse (0 \= peu adaptée, 1 \= très adaptée). |
+| `Energy` | float | Mesure (0 à 1\) de l'intensité et de l'activité du morceau. Plus la valeur est élevée, plus le morceau est énergique et dynamique. |
+| `Key` | catégorielle | Tonalité de la chanson représentée par un chiffre (0 \= Do, 1 \= Do♯/Ré♭, 2 \= Ré, etc.). Une valeur de \-1 indique une tonalité non détectée. |
+| `Loudness` | float | Volume moyen de la chanson en décibels (dB), généralement entre \-60 et 0 dB. |
+| `Speechiness` | float | Indique (0 à 1\) la présence de paroles parlées (0 \= essentiellement musicale, \>0.66 \= essentiellement parlée, entre 0.33 et 0.66 \= mixte). |
+| `Acousticness` | float | Probabilité (0 à 1\) que le morceau soit acoustique (1 \= forte certitude d’un morceau acoustique). |
+| `Instrumentalness` | float | Probabilité (0 à 1\) que le morceau soit instrumental (sans voix). Plus la valeur est élevée, plus la chanson est probablement instrumentale. |
+| `Liveness` | float | Probabilité (0 à 1\) que le morceau ait été enregistré en direct (live). Valeurs \> 0.8 indiquent probablement une performance live. |
+| `Valence` | float | Score (0 à 1\) représentant l’émotion positive transmise par la chanson (0 \= négatif/triste, 1 \= positif/joyeux). |
+| `Tempo` | float | Tempo moyen de la chanson en battements par minute (BPM). |
+| `Duration_ms` | float | Durée totale du morceau en millisecondes. |
+| `Stream` | entier | Nombre total d’écoutes de la chanson sur Spotify. |
+| `Url_youtube` | string | Lien vers la vidéo de la chanson sur YouTube, si disponible. |
+| `Title` | string | Titre de la vidéo YouTube associée. |
+| `Channel` | string | Nom de la chaîne YouTube qui a publié la vidéo. |
+| `Views` | entier | Nombre de vues sur YouTube. |
+| `Likes` | entier | Nombre de "J’aime" sur YouTube. |
+| `Comments` | entier | Nombre de commentaires sur la vidéo YouTube. |
+| `Description` | string | Description de la vidéo sur YouTube. |
+| `Licensed` | catégorielle | Indique si la vidéo contient du contenu sous licence officielle revendiquée par un partenaire YouTube. |
+| `official_video` | catégorielle | Valeur booléenne (Vrai/Faux) indiquant si la vidéo YouTube est la vidéo officielle de la chanson. |
+
+Le dataset utilisé est complet et ne devrait pas nécessiter de traitement de données particulier avant son utilisation. Cependant, pour l’analyse de données dans le cadre de notre projet, certaines features ne sont pas nécessaires, tel que : 
+
+* `Url_spotify`
+* `Uri`  
+* `Url_youtube`  
+* `Description`
