@@ -43,3 +43,25 @@ Le dataset utilisé est complet et ne devrait pas nécessiter de traitement de d
 * `Uri`  
 * `Url_youtube`  
 * `Description`
+
+On charge les données
+```{r}
+library(tidyverse);
+library(dplyr);
+library(magrittr);
+
+dataset <- read_csv('data/Spotify_Youtube.csv');
+```
+
+## 7. Quelles sont les variables qui influencent les performances sur Youtube et les streams Spotify ?
+Heatmap de corrélation
+```{r}
+numeric <- dataset %>% select(where(is.numeric), -...1);
+correlation <- numeric %>% cor(method="pearson", use = "complete.obs") %>% as.table() %>% as.data.frame() %>% mutate(value=abs(Freq));
+correlation %>% ggplot(aes(x=Var1, y=Var2, fill=value)) + geom_tile() + scale_fill_viridis_c(option="inferno") + theme(axis.title=element_blank()) + ggtitle("Corrélation entre les différentes features et les performances") + labs(fill="Indice de\ncorrélation");
+```
+Barplots
+```{r}
+columns <- c("Stream", "Views", "Likes", "Comments")
+correlation %>% filter(Var1 %in% columns & !Var2 %in% columns) %>% ggplot(aes(x=Var2, y=value, fill=Var1)) + geom_bar(position="dodge", stat="identity") + labs(x="Feature", y="Corrélation", fill="Performance") + ggtitle("Importance des features dans la performance de la musique sur Spotify et Youtube")
+```
