@@ -1,7 +1,8 @@
 ---
-output:
-  pdf_document: default
-  html_document: default
+title: "Rapport"
+author: "Alban, Paul Fernandez, Thomas Matambas, Klimentiy Mirek"
+date: "2025-04-23"
+output: html_document
 ---
 # IF36 \- Proposition
 
@@ -408,39 +409,39 @@ Calcul des moyennes de chaque caracteristique
 ```{r}
 avg_danceability <- dataset %>%
   group_by(Key) %>%
-  summarise(mean_danceability = mean(Danceability, na.rm = TRUE))
+  summarise(danceability = mean(Danceability, na.rm = TRUE))
 
 avg_Energy <- dataset %>%
   group_by(Key) %>%
-  summarise(mean_energy = mean(Energy, na.rm = TRUE))
+  summarise(energy = mean(Energy, na.rm = TRUE))
 
 avg_Loudness <- dataset %>%
   group_by(Key) %>%
-  summarise(mean_loudness = mean(Loudness, na.rm = TRUE))
+  summarise(loudness = mean(Loudness, na.rm = TRUE))
 
 avg_Speechiness <- dataset %>%
   group_by(Key) %>%
-  summarise(mean_speechiness = mean(Speechiness, na.rm = TRUE))
+  summarise(speechiness = mean(Speechiness, na.rm = TRUE))
 
 avg_Acousticness <- dataset %>%
   group_by(Key) %>%
-  summarise(mean_acousticness = mean(Acousticness, na.rm = TRUE))
+  summarise(acousticness = mean(Acousticness, na.rm = TRUE))
 
 avg_Instrumentalness <- dataset %>%
   group_by(Key) %>%
-  summarise(mean_instrumentalness = mean(Instrumentalness, na.rm = TRUE))
+  summarise(instrumentalness = mean(Instrumentalness, na.rm = TRUE))
 
 avg_Liveness <- dataset %>%
   group_by(Key) %>%
-  summarise(mean_liveness = mean(Liveness, na.rm = TRUE))
+  summarise(liveness = mean(Liveness, na.rm = TRUE))
 
 avg_Valence <- dataset %>%
   group_by(Key) %>%
-  summarise(mean_valence = mean(Valence, na.rm = TRUE))
+  summarise(valence = mean(Valence, na.rm = TRUE))
 
 avg_Tempo <- dataset %>%
   group_by(Key) %>%
-  summarise(mean_tempo = mean(Tempo, na.rm = TRUE))
+  summarise(tempo = mean(Tempo, na.rm = TRUE))
 ```
 Affichage du graphique 1
 ```{r}
@@ -449,13 +450,13 @@ graphe_11_a <- data.frame(
   avg_Acousticness[2], avg_Speechiness[2], avg_Energy[2], avg_danceability[2]
 )
 graphe_11_a <- graphe_11_a |>
-  pivot_longer(cols = mean_liveness:mean_danceability,
+  pivot_longer(cols = liveness:danceability,
                names_to = "Type",
                values_to = "Value")
 
 ggplot(graphe_11_a, aes(x = Key, y = Value, fill = Type)) +
   geom_bar(stat = "identity", position = position_dodge()) + 
-  ggtitle("Graphique 1 : Les caracteristiques musicales en fonction de la tonalité") +
+  ggtitle("Graphiuqe 1 : Les caracteristiques musicales en fonction de la tonalité") +
   labs(y = "Score (entre 0 et 1)", x = "Tonalité", fill="Caracteristique")
 ```
 Affichage du graphique 2
@@ -463,8 +464,8 @@ Affichage du graphique 2
 graphe_11_b <- data.frame(avg_Tempo[1],avg_Tempo[2])
 
 ggplot(graphe_11_b, aes(x = Key, y = mean_tempo)) +
-  geom_bar(stat = "identity", position = position_dodge(),fill="darkolivegreen4") + 
-  ggtitle("Graphique 2 : Le Tempo des musiques en fonction de la tonalité") +
+  geom_bar(stat = "identity", position = position_dodge(), width = 0.2, fill="darkolivegreen4") + 
+  ggtitle("Graphiuqe 2 : Le Tempo des musiques en fonction de la tonalité") +
   labs(y = "Tempo (entre 0 et 125 BPM)", x = "Tonalité")
 ```
 Affichage du graphique 3
@@ -472,8 +473,8 @@ Affichage du graphique 3
 graphe_11_c <- data.frame(avg_Tempo[1],avg_Loudness[2])
 
 ggplot(graphe_11_c, aes(x = Key, y = mean_loudness)) +
-  geom_bar(stat = "identity", position = position_dodge(),fill="deeppink1") + 
-  ggtitle(" Graphique 3 : Le Loudness des musiques en fonction de la tonalité") +
+  geom_bar(stat = "identity", position = position_dodge(), width = 0.2, fill="deeppink1") + 
+  ggtitle("Graphique 3 : Le Loudness des musiques en fonction de la tonalité") +
   labs(y = "Loudness (entre 0 et -60 dB)", x = "Tonalité")
 ```
-
+**Observations diverses : **
