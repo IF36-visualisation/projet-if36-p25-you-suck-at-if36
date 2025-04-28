@@ -44,16 +44,21 @@ Le dataset utilisé est complet et ne devrait pas nécessiter de traitement de d
 * `Url_youtube`  
 * `Description`
 
-On charge les données
+## Chargement des Librairies utilisées
 ```{r}
 library(tidyverse);
 library(dplyr);
 library(magrittr);
+```
 
+## Traitement du dataset
+```{r}
 dataset <- read_csv('data/Spotify_Youtube.csv');
 ```
 
-### 7. Quelles sont les variables qui influencent les performances sur Youtube et les streams Spotify ?
+## Analyse detaillée du dataset
+
+### Question 7 :  Quelles sont les variables qui influencent les performances sur Youtube et les streams Spotify ?
 Heatmap de corrélation
 ```{r}
 numeric <- dataset %>% select(where(is.numeric), -...1);
@@ -66,8 +71,7 @@ columns <- c("Stream", "Views", "Likes", "Comments")
 correlation %>% filter(Var1 %in% columns & !Var2 %in% columns) %>% ggplot(aes(x=Var2, y=value, fill=Var1)) + geom_bar(position="dodge", stat="identity") + labs(x="Feature", y="Corrélation", fill="Performance") + ggtitle("Importance des features dans la performance de la musique sur Spotify et Youtube")
 ```
 
-### Question 13 :
-Quel artiste est le plus populaire au moment du 7 février 2023 ?  
+### Question 13 : Quel artiste est le plus populaire au moment du 7 février 2023 ?  
 Nous allons analyser cela selon :
 - le nombre de vues sur YouTube
 - le nombre d'écoutes sur Spotify
@@ -259,3 +263,5 @@ ggplot(youtube_only_dataset, aes(Total_Streams/1e6, reorder(Artist, Total_Stream
 On voit en bas de chaque classement les artistes qui ont de grosses disparités d'interaction entre les plateformes.
 Parmi les artistes du top stream, on voit qu'Olivia Rodrigo ou Doja Cat ont beaucoup moins d'interactions sur YouTube.
 Au contraire, on voit que des artistes ayant un fort succès sur YouTube comme CoComelon ou PSY ont des performances bien moindres sur Spotify.
+
+### Question 14 : 
