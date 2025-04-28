@@ -317,7 +317,7 @@ ggplot(graphe_11_c, aes(x = Key, y = loudness)) +
 
 D'apres les 3 visualisations ci-dessus, nous pouvons constater que la tonalité n'a pas d'effet sur les caracteristiques musicales.
 
-La question a été répondue, mais cette réponse n'est pas la même que dans les hypothèses posées ci-dessus.. Ce que peut être envisagé, c'est de verifier comment les scores ont été calculés par les algorithmes de Spotify et de Youtube.
+La question a été répondue, mais cette réponse n'est pas la même que dans les hypothèses posées ci-dessus. Ce qui peut être envisagé, c'est de vérifier comment les scores ont été calculés par les algorithmes de Spotify et de YouTube.
 
 
 ### Question 13 : Quel artiste est le plus populaire au moment du 7 février 2023 ?  
