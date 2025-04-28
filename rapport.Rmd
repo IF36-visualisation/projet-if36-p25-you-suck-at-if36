@@ -2,7 +2,9 @@
 title: "Rapport"
 author: "Alban Souchard, Paul Fernandez, Thomas Matambas, Klimentiy Mirek"
 date: "2025-04-23"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 # IF36 \- Proposition
 
@@ -82,7 +84,7 @@ dataset %>% ggplot(aes(x=Tempo, y=Danceability)) +
 ```
 D'après le graphique, on constate qu'il y a une légère corrélation entre le tempo et la *danceability*. En effet, plus le tempo est élevé, plus la *danceability* augmente, jusqu'à un certain point. Au-delà de 120 BPM, la *danceability* semble se stabiliser voir même diminuer. Cela peut s'expliquer par le fait que les morceaux très rapides peuvent devenir trop complexes pour être dansés facilement. Ou encore que l'ensemble des données est très concentré vers les 100 BPM, ce qui fausse la perception de la tendance.
 
-``` {r}
+```{r}
 # affichage de la repartition du tempo 
 dataset %>% ggplot(aes(x=Tempo)) + 
   geom_histogram(binwidth=5, fill="steelblue", color="black", alpha=0.7) +
@@ -96,6 +98,8 @@ dataset %>% ggplot(aes(x=Tempo)) +
 
 ```
 En effet on remarque que la forme est similaire à une gaussienne, avec un maximum vers 100 BPM. Cela peut expliquer la tendance observée précédemment. Il n'y aurait donc pas ou très peu de corrélation entre le tempo et la *danceability*.
+
+***
 
 ### Question 7 :  Quelles sont les variables qui influencent les performances sur Youtube et Spotify ?
 
@@ -319,6 +323,7 @@ D'après les 3 visualisations ci-dessus, nous pouvons constater que la tonalité
 
 La question a été répondue, mais cette réponse n'est pas la même que dans les hypothèses posées ci-dessus. Ce qui peut être envisagé, c'est de vérifier comment les scores ont été calculés par les algorithmes de Spotify et de YouTube.
 
+***
 
 ### Question 13 : Quel artiste est le plus populaire au moment du 7 février 2023 ?  
 Nous allons analyser cela selon :
