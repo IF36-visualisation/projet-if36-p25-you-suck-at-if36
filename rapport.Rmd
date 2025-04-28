@@ -1,6 +1,6 @@
 ---
 title: "Rapport"
-author: "Alban, Paul Fernandez, Thomas Matambas, Klimentiy Mirek"
+author: "Alban Souchard, Paul Fernandez, Thomas Matambas, Klimentiy Mirek"
 date: "2025-04-23"
 output: html_document
 ---
