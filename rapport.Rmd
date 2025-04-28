@@ -315,7 +315,7 @@ ggplot(graphe_11_c, aes(x = Key, y = loudness)) +
 
 **Observatons diverses**
 
-D'apres les 3 visualisations ci-dessus, nous pouvons constater que la tonalité et les diffrentes n'a pas d'effet sur les caracteristiques musicales.
+D'apres les 3 visualisations ci-dessus, nous pouvons constater que la tonalité n'a pas d'effet sur les caracteristiques musicales.
 
 La question a etait repondu, mais cette reponse n'est pas le meme que dans les hypotheses posés ci-dessus. Ce qui peut etre envisagé, c'est de verifier comment les scores ont etaient calculés par les algorithmes de Spotify et de Youtube.
 
