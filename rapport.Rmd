@@ -80,6 +80,22 @@ dataset %>% ggplot(aes(x=Tempo, y=Danceability)) +
   axis.text = element_text(size=12)
 );
 ```
+D'après le graphique, on constate qu'il y a une légère corrélation entre le tempo et la danceabilité. En effet, plus le tempo est élevé, plus la danseabilité augmente, jusqu'à un certain point. Au-delà de 120 BPM, la danseabilité semble se stabiliser voir même diminuer. Cela peut s'expliquer par le fait que les morceaux très rapides peuvent devenir trop complexes pour être dansés facilement. Ou encore que l'ensemble des données est très concentré vers les 100 BPM, ce qui fausse la perception de la tendance.
+
+``` {r}
+# affichage de la repartition du tempo 
+dataset %>% ggplot(aes(x=Tempo)) + 
+  geom_histogram(binwidth=5, fill="steelblue", color="black", alpha=0.7) +
+  labs(title="Répartition du tempo", x="Tempo (BPM)", y="Nombre de morceaux") + 
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust=0.5, size=16),
+    axis.title = element_text(size=14),
+    axis.text = element_text(size=12)
+  );
+
+```
+En effet on remarque que la forme est similaire à une gaussienne, avec un maximum vers 100 BPM. Cela peut expliquer la tendance observée précédemment. Il n'y aurait donc pas ou très peu de corrélation entre le tempo et la danseabilité.
 
 ### Question 7 :  Quelles sont les variables qui influencent les performances sur Youtube et Spotify ?
 
