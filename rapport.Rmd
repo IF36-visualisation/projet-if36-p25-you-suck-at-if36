@@ -49,8 +49,8 @@ Le dataset utilisé est complet et ne devrait pas nécessiter de traitement de d
 library(tidyverse);
 library(dplyr);
 library(magrittr);
-library(RColorBrewer)
-library(tidyr)
+library(RColorBrewer);
+library(tidyr);
 ```
 
 ## Traitement du dataset
@@ -307,15 +307,35 @@ avg_Tempo <- dataset %>%
   group_by(Key) %>%
   summarise(mean_tempo = mean(Tempo, na.rm = TRUE))
 ```
-Affichage du graphique
+Affichage du graphique 1
 ```
-graphe_11_a <- data.frame(avg_Tempo[1], avg_Valence[2], avg_Liveness[2], avg_Instrumentalness[2], avg_Acousticness[2], avg_Speechiness[2]ed, avg_Energy[2], avg_danceability[2])
-head(df)
+graphe_11_a <- data.frame(avg_Tempo[1], avg_Valence[2], avg_Liveness[2], avg_Instrumentalness[2], avg_Acousticness[2], avg_Speechiness[2], avg_Energy[2], avg_danceability[2])
 graphe_11_a <- graphe_11_a |>
   pivot_longer(cols = mean_liveness:mean_danceability,
                names_to = "Type",
                values_to = "Value")
+
 ggplot(graphe_11_a, aes(x = Key, y = Value, fill = Type)) +
-  geom_bar(stat = "identity", position = position_dodge())
+  geom_bar(stat = "identity", position = position_dodge()) + 
+  ggtitle("Graphique 1 : Les caracteristiques musicales en fonction de la tonalité") +
+  labs(y = "Score (entre 0 et 1)", x = "Tonalité", fill="Caracteristique")
+```
+Affichage du graphique 2
+```
+graphe_11_b <- data.frame(avg_Tempo[1],avg_Tempo[2])
+
+ggplot(graphe_11_b, aes(x = Key, y = mean_tempo)) +
+  geom_bar(stat = "identity", position = position_dodge(),fill="darkolivegreen4") + 
+  ggtitle("Graphique 2 : Le Tempo des musiques en fonction de la tonalité") +
+  labs(y = "Tempo (entre 0 et 125 BPM)", x = "Tonalité")
+```
+Affichage du graphique 3
+```
+graphe_11_c <- data.frame(avg_Tempo[1],avg_Loudness[2])
+
+ggplot(graphe_11_c, aes(x = Key, y = mean_loudness)) +
+  geom_bar(stat = "identity", position = position_dodge(),fill="deeppink1") + 
+  ggtitle(" Graphique 3 : Le Loudness des musiques en fonction de la tonalité") +
+  labs(y = "Loudness (entre 0 et -60 dB)", x = "Tonalité")
 ```
 
