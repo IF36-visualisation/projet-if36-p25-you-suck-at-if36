@@ -49,6 +49,8 @@ Le dataset utilisé est complet et ne devrait pas nécessiter de traitement de d
 library(tidyverse);
 library(dplyr);
 library(magrittr);
+library(RColorBrewer)
+library(tidyr)
 ```
 
 ## Traitement du dataset
@@ -264,4 +266,44 @@ On voit en bas de chaque classement les artistes qui ont de grosses disparités 
 Parmi les artistes du top stream, on voit qu'Olivia Rodrigo ou Doja Cat ont beaucoup moins d'interactions sur YouTube.
 Au contraire, on voit que des artistes ayant un fort succès sur YouTube comme CoComelon ou PSY ont des performances bien moindres sur Spotify.
 
-### Question 14 : 
+### Question 11 : Est-ce qu'une tonbalité a un effet sur le type de chanson ? 
+Dans cette question, nous allons examiner les differentes caracteristiques des musiques pour chaque tonalité.
+
+Calcul des moyennes de chaque caracteristique 
+```{r}
+avg_danceability <- dataset %>%
+  group_by(Key) %>%
+  summarise(mean_danceability = mean(Danceability, na.rm = TRUE))
+
+avg_Energy <- dataset %>%
+  group_by(Key) %>%
+  summarise(mean_energy = mean(Energy, na.rm = TRUE))
+
+avg_Loudness <- dataset %>%
+  group_by(Key) %>%
+  summarise(mean_loudness = mean(Loudness, na.rm = TRUE))
+
+avg_Speechiness <- dataset %>%
+  group_by(Key) %>%
+  summarise(mean_speechiness = mean(Speechiness, na.rm = TRUE))
+
+avg_Acousticness <- dataset %>%
+  group_by(Key) %>%
+  summarise(mean_acousticness = mean(Acousticness, na.rm = TRUE))
+
+avg_Instrumentalness <- dataset %>%
+  group_by(Key) %>%
+  summarise(mean_instrumentalness = mean(Instrumentalness, na.rm = TRUE))
+
+avg_Liveness <- dataset %>%
+  group_by(Key) %>%
+  summarise(mean_liveness = mean(Liveness, na.rm = TRUE))
+
+avg_Valence <- dataset %>%
+  group_by(Key) %>%
+  summarise(mean_valence = mean(Valence, na.rm = TRUE))
+
+avg_Tempo <- dataset %>%
+  group_by(Key) %>%
+  summarise(mean_tempo = mean(Tempo, na.rm = TRUE))
+```
