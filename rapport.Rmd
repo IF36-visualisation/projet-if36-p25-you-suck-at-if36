@@ -1,3 +1,8 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
 # IF36 \- Proposition
 
 ## Introduction
@@ -7,7 +12,7 @@ Dans le cadre du projet pour l’UE IF36, “Visualiser des données”, notre g
 Ce jeu de données est composé de 20 717 individus, avec 28 features. Le tableau suivant contient chaque feature, type et son description : 
 
 | *Feature*  | *Type* | *Description* |
-| :---- | :---- | :---- |
+| :-- | :-- | :------ |
 | \# | entier | id |
 | `Track` | string | Nom de la chanson tel qu'affiché sur Spotify. |
 | `Artist` | string | Nom de l'artiste. |
@@ -17,7 +22,7 @@ Ce jeu de données est composé de 20 717 individus, avec 28 features. Le tablea
 | `Uri` | string | Lien Spotify utilisé pour identifier précisément la chanson via l’API Spotify. |
 | `Danceability` | float | Score (0 à 1\) indiquant à quel point la chanson est adaptée à la danse (0 \= peu adaptée, 1 \= très adaptée). |
 | `Energy` | float | Mesure (0 à 1\) de l'intensité et de l'activité du morceau. Plus la valeur est élevée, plus le morceau est énergique et dynamique. |
-| `Key` | catégorielle | Tonalité de la chanson représentée par un chiffre (0 \= Do, 1 \= Do♯/Ré♭, 2 \= Ré, etc.). Une valeur de \-1 indique une tonalité non détectée. |
+| `Key` | catégorielle | Tonalité de la chanson représentée par un chiffre (0 \= Do, 1 \= Do/Ré, 2 \= Ré, etc.). Une valeur de \-1 indique une tonalité non détectée. |
 | `Loudness` | float | Volume moyen de la chanson en décibels (dB), généralement entre \-60 et 0 dB. |
 | `Speechiness` | float | Indique (0 à 1\) la présence de paroles parlées (0 \= essentiellement musicale, \>0.66 \= essentiellement parlée, entre 0.33 et 0.66 \= mixte). |
 | `Acousticness` | float | Probabilité (0 à 1\) que le morceau soit acoustique (1 \= forte certitude d’un morceau acoustique). |
@@ -45,16 +50,16 @@ Le dataset utilisé est complet et ne devrait pas nécessiter de traitement de d
 * `Description`
 
 ## Chargement des Librairies utilisées
-```{r}
-library(tidyverse);
+```{r, warning = FALSE, message = FALSE}
+library(ggplot2);
+library(scales);
+library(readr);
 library(dplyr);
 library(magrittr);
-library(RColorBrewer);
-library(tidyr);
 ```
 
 ## Traitement du dataset
-```{r}
+```{r, warning = FALSE, message = TRUE}
 dataset <- read_csv('data/Spotify_Youtube.csv');
 ```
 
@@ -72,19 +77,125 @@ dataset %>% ggplot(aes(x=Tempo, y=Danceability)) +
   axis.title = element_text(size=14),
   axis.text = element_text(size=12)
 );
-
-### Question 7 :  Quelles sont les variables qui influencent les performances sur Youtube et les streams Spotify ?
-Heatmap de corrélation
-```{r}
-numeric <- dataset %>% select(where(is.numeric), -...1);
-correlation <- numeric %>% cor(method="pearson", use = "complete.obs") %>% as.table() %>% as.data.frame() %>% mutate(value=abs(Freq));
-correlation %>% ggplot(aes(x=Var1, y=Var2, fill=value)) + geom_tile() + scale_fill_viridis_c(option="inferno") + theme(axis.title=element_blank()) + ggtitle("Corrélation entre les différentes features et les performances") + labs(fill="Indice de\ncorrélation");
 ```
-Barplots
+
+### Question 7 :  Quelles sont les variables qui influencent les performances sur Youtube et Spotify ?
+
+**Hypothèse :**
+Certaines features, comme l'énergie ou le tempo sont peut être corrélées avec les performances. Pour rappel, les indicateurs de performance dépendent de la plateforme :
+
+- nombre de vues, likes et commentaires pour Youtube
+- nombre de streams pour Spotify
+
+**Traitement des données :**
+Nous souhaitons réaliser une heatmap de la corrélation entre les features et les performances des musiques. Puisque la performance ne se mesure pas de la même façon sur les deux plateformes, nous allons faire deux heatmaps et donc séparer le dataset en deux : les musiques présentes sur Spotify et les musiques présentes sur Youtube. \
+Afin de calculer correctement la corrélation entre les différentes features et les indices de performance, on enlève également toutes les musiques dont au moins une feature est absente de notre dataset.
+```{r}
+# Commençons par Spotify
+spotify_dataset <- dataset %>%
+  filter(!is.na(Stream)) %>% # On retire les musiques qui n'ont pas de nombre de streams
+  select(where(is.numeric), -...1, -Likes, -Views, -Comments) %>% # On retire les colonnes inutiles
+  na.omit(); # On retire la ligne si elle contient des valeurs non numériques
+spotify_dataset %>%
+  nrow() %>%
+  print(); # On affiche le nombre de musiques présentes sur Spotify
+# Faisons la même chose pour Youtube
+youtube_dataset <- dataset %>%
+  filter(!is.na(Views)) %>%
+  select(where(is.numeric), -...1, -Stream) %>%
+  na.omit();
+youtube_dataset %>%
+  nrow() %>%
+  print();
+```
+On va donc visualiser les données de $20140$ musiques pour Spotify et $20099$ musiques pour Youtube.
+
+**Visualisations :**
+Faisons d'abord une heatmap pour montrer la corrélation entre les différentes features et la performance des musiques sur Spotify :
+```{r}
+correlation <- spotify_dataset %>%
+  cor(method="pearson") %>% # Dressons une matrice de corrélation en utilisant les valeurs
+  as.table() %>% # On transforme la matrice en un tableau contenant la ligne, la colonne et la valeur
+  as.data.frame() %>% # On recupère le tableau dans un dataframe
+  mutate(value=abs(Freq)); # On ne conserve que la valeur absolue de la corrélation
+correlation %>%
+  ggplot(aes(x=Var1, y=Var2, fill=value)) +
+  geom_tile() +
+  scale_fill_viridis_c(option="inferno") +
+  theme(
+    axis.title=element_blank(),
+    axis.text.x = element_text(angle = 90, vjust = 0.4, hjust = 0.9),
+    plot.title = element_text(size=12)
+  ) +
+  ggtitle("Corrélation entre les différentes features et les performances sur Spotify") +
+  labs(fill="Indice de\ncorrélation");
+```
+On constate déjà que la performance sur Spotify *(Stream)* est très peu corrélée avec les différentes features des musiques. On voit que la corrélation la plus élevée reste très faible (~15%) et concerne l'intensité sonore, l'acoustique et l'instrumentalité.
+
+Afin d'y voir plus clair, nous allons réaliser un *BarPlot* des features pour afficher leur corrélation avec le nombre de streams :
 ```{r}
 columns <- c("Stream", "Views", "Likes", "Comments")
-correlation %>% filter(Var1 %in% columns & !Var2 %in% columns) %>% ggplot(aes(x=Var2, y=value, fill=Var1)) + geom_bar(position="dodge", stat="identity") + labs(x="Feature", y="Corrélation", fill="Performance") + ggtitle("Importance des features dans la performance de la musique sur Spotify et Youtube")
+correlation %>%
+  filter(Var1 %in% columns & !Var2 %in% columns) %>%
+  ggplot(aes(x=Var2, y=value, fill=Var1)) +
+  geom_bar(position="dodge", stat="identity") +
+  theme(
+    axis.text.x = element_text(angle = 90, vjust = 0.4, hjust = 0.9),
+    plot.title = element_text(size=12)
+  ) +
+  labs(x="Feature", y="Corrélation", fill="Performance") +
+  ggtitle("Importance des features dans la performance de la musique sur Spotify");
 ```
+On peut désormais classer plus facilement les différentes features en ordre d'importance : *Loudness* puis *Acousticness* puis *Instrumentalness*. \
+Cependant, ces valeurs restent faibles (environ 10% de corrélation) : il n'y a donc pas de recette miracle pour percer sur Spotify !
+
+Regardons maintenant ce qu'il en est sur Youtube. On souhaite regarder ici la corrélation entre les différentes features et le nombre de vues, de likes et de commentaires :
+```{r}
+correlation <- youtube_dataset %>%
+  cor(method="pearson") %>%
+  as.table() %>%
+  as.data.frame() %>%
+  mutate(value=abs(Freq));
+correlation %>%
+  ggplot(aes(x=Var1, y=Var2, fill=value)) +
+  geom_tile() +
+  scale_fill_viridis_c(option="inferno") +
+  theme(
+    axis.title=element_blank(),
+    axis.text.x = element_text(angle = 90, vjust = 0.4, hjust = 0.9),
+    plot.title = element_text(size=12)
+  ) +
+  ggtitle("Corrélation entre les différentes features et les performances sur Youtube") +
+  labs(fill="Indice de\ncorrélation");
+```
+On remarque deux choses :
+
+- il va falloir réfléchir à notre indicateur de succès puisque les likes et les vues sont plus corrélées entre elles qu'avec le nombre de commentaires
+- les features qui semblent le plus impactantes sur la performance d'une musique sont, comme sur Spotify, l'intensité sonore, l'acoustique, l'instrumentalité avec le côté dansant de la musique.
+
+De la même façon que précédemment, on affiche la corrélation entre les différentes features et nos indicateurs de performance :
+```{r}
+columns <- c("Stream", "Views", "Likes", "Comments")
+correlation %>%
+  filter(Var1 %in% columns & !Var2 %in% columns) %>%
+  ggplot(aes(x=Var2, y=value, fill=Var1)) +
+  geom_bar(position="dodge", stat="identity") +
+  theme(
+    axis.text.x = element_text(angle = 90, vjust = 0.4, hjust = 0.9),
+    plot.title = element_text(size=12)
+  ) +
+  labs(x="Feature", y="Corrélation", fill="Performance") +
+  ggtitle("Importance des features dans la performance de la musique sur Youtube");
+```
+Le côté dansant de la musique arrive en $2^e$ position, et semble donc plus important que sur Spotify. Cela dit, cela reste à nuancer puisque la corrélation reste très faible. Ainsi, comme sur Spotify, nous n'avons pas encore trouvé la recette du succès sur Youtube.
+
+**Observations diverses :**
+Nous avons constaté différentes choses intéressantes dans ces visualisations :
+
+* les critères de performance sur Youtube ne sont pas corrélés entre eux
+* certaines features semblent corrélées entre elles
+
+***
 
 ### Question 13 : Quel artiste est le plus populaire au moment du 7 février 2023 ?  
 Nous allons analyser cela selon :
@@ -111,7 +222,7 @@ cat("Nombre total de musiques :", total_musiques, "\n")
 cat("Nombre de musiques sans vidéos YouTube :", total_sans_ytb, "\n")
 cat("Pourcentage de musiques sans vidéos YouTube :", round(pourcentage_sans_ytb, 2), "%\n")
 ```
-Étant donné que seulement 2.27% des musiques ne disposent pas de données YouTube, nous avons décidé de les supprimer sans risque d'altérer l'analyse globale.
+Étant donné que seulement $2,27%$ des musiques ne disposent pas de données YouTube, nous avons décidé de les supprimer sans risque d'altérer l'analyse globale.
 ```{r}
 # Suppression des musiques sans URL YouTube
 dataset <- dataset[dataset$Url_youtube != '',]
@@ -167,7 +278,7 @@ ggplot(top_streams, aes(x = Total_Streams/1e6, y = reorder(paste(Rank_Spotify, A
     axis.text.y = element_text(size = 6)    # textes des artistes plus petits pour aérer
   )
 ```
-On constate que certains artistes affichent des disparités entre vues et streams.Par exemple, Post Malone est premier en nombre de streams Spotify mais se classe seulement 37e en vues YouTube, tandis que CoComelon est deuxième en vues YouTube sans apparaître dans le top Spotify.
+On constate que certains artistes affichent des disparités entre vues et streams.Par exemple, Post Malone est premier en nombre de streams Spotify mais se classe seulement $37^e$ en vues YouTube, tandis que CoComelon est deuxième en vues YouTube sans apparaître dans le top Spotify.
 Cela confirme l'idée que la plateforme impacte la visibilité et la consommation de certains artistes.
 ```{r, fig.width=8, fig.height=10, dpi=130}
 # Top 50 artistes combiné (Vues + Streams)
@@ -201,8 +312,9 @@ Au sommet du classement on trouve Ed Sheeran avec presque 30 milliards d'interac
 Des stars internationales remplissent le sommet du top : Justin Bieber, Coldplay, Post Malone Dua Lipa ...
 
 **Observations diverses : **
-- Katy Perry (9ᵉ combiné) est beaucoup plus forte sur YouTube que sur Spotify (typé vidéo/Youtube).
-- Post Malone (4ᵉ combiné) a plus du double de streams Spotify que de vues YouTube (typé audio/Spotify).
+
+- Katy Perry ($9^e$ combiné) est beaucoup plus forte sur YouTube que sur Spotify (typé vidéo/Youtube).
+- Post Malone ($4^e$ combiné) a plus du double de streams Spotify que de vues YouTube (typé audio/Spotify).
 - Luis Fonsi et Daddy Yankee : leur classement est boosté par d'énormes succès vidéo (ex: Despacito) mais leur streaming audio pur est plus faible.
 - CoComelon (contenu enfant) : extrêmement populaire sur YouTube, beaucoup moins sur Spotify (presque anecdotique en streaming pur).
 - Certains artistes comme Coldplay, Imagine Dragons, Bruno Mars performent de façon équilibrée entre plateformes.
