@@ -53,7 +53,7 @@ library(magrittr);
 dataset <- read_csv('data/Spotify_Youtube.csv');
 ```
 
-## 7. Quelles sont les variables qui influencent les performances sur Youtube et les streams Spotify ?
+### 7. Quelles sont les variables qui influencent les performances sur Youtube et les streams Spotify ?
 Heatmap de corrélation
 ```{r}
 numeric <- dataset %>% select(where(is.numeric), -...1);
@@ -65,3 +65,197 @@ Barplots
 columns <- c("Stream", "Views", "Likes", "Comments")
 correlation %>% filter(Var1 %in% columns & !Var2 %in% columns) %>% ggplot(aes(x=Var2, y=value, fill=Var1)) + geom_bar(position="dodge", stat="identity") + labs(x="Feature", y="Corrélation", fill="Performance") + ggtitle("Importance des features dans la performance de la musique sur Spotify et Youtube")
 ```
+
+### Question 13 :
+Quel artiste est le plus populaire au moment du 7 février 2023 ?  
+Nous allons analyser cela selon :
+- le nombre de vues sur YouTube
+- le nombre d'écoutes sur Spotify
+- une moyenne combinée des deux plateformes
+
+**Hypothèse :**
+On peut imaginer que certains artistes sont beaucoup plus populaires sur une plateforme que sur l’autre, selon le public visé.
+
+**Traitement des données :**
+Le datasetset contient 2079 artistes uniques, il est donc préférable d'afficher uniquement les **50 artistes les plus populaires** pour garder des graphiques lisibles.
+
+On constate aussi que certains individus n'ont pas d'url Youtube, ce qui pourrait compremettre la comparaison vues/streams
+```{r}
+# nb total de musiques
+total_musiques <- nrow(dataset)
+# nb d'individus sans vidéos youtube
+total_sans_ytb <- nrow(dataset[dataset$Url_youtube == '',])
+# % d'individus sans vidéos youtube
+pourcentage_sans_ytb <- (total_sans_ytb / total_musiques) * 100
+
+cat("Nombre total de musiques :", total_musiques, "\n")
+cat("Nombre de musiques sans vidéos YouTube :", total_sans_ytb, "\n")
+cat("Pourcentage de musiques sans vidéos YouTube :", round(pourcentage_sans_ytb, 2), "%\n")
+```
+Étant donné que seulement 2.27% des musiques ne disposent pas de données YouTube, nous avons décidé de les supprimer sans risque d'altérer l'analyse globale.
+```{r}
+# Suppression des musiques sans URL YouTube
+dataset <- dataset[dataset$Url_youtube != '',]
+total_musiques <- nrow(dataset)
+cat("Nombre total de musiques après suppression :", total_musiques, "\n")
+```
+**Visualisations :**
+
+```{r, fig.width=8, fig.height=10, dpi=130}
+# Top 50 artistes selon les vues YouTube
+top_views <- dataset %>%
+  group_by(Artist) %>%
+  summarise(Total_Views = sum(Views, na.rm = TRUE)) %>%
+  arrange(desc(Total_Views)) %>%
+  slice_head(n = 50) %>%
+  mutate(Rank_Youtube = row_number())
+
+# Graphique
+ggplot(top_views, aes(x = Total_Views/1e6, y = reorder(paste(Rank_Youtube, Artist, sep = " - "), Total_Views))) +
+  geom_point(size = 3) +
+  geom_text(aes(label = round(Total_Views/1e6,1)), hjust = -0.5, size = 2.5) +
+  labs(title = "Top 50 artistes - Vues YouTube",
+       x = "Nombre de vues (en millions)",
+       y = "Artiste") +
+  scale_x_continuous(labels = comma, expand = expansion(mult = c(0, 0.15))) +
+  theme_minimal() +
+  theme(
+    plot.margin = margin(10, 40, 10, 10),  # marges plus larges à droite
+    axis.text.y = element_text(size = 6)    # textes des artistes plus petits pour aérer
+  )
+```
+
+```{r, fig.width=8, fig.height=10, dpi=130}
+# Top 50 artistes selon les streams Spotify
+top_streams <- dataset %>%
+  group_by(Artist) %>%
+  summarise(Total_Streams = sum(Stream, na.rm = TRUE)) %>%
+  arrange(desc(Total_Streams)) %>%
+  slice_head(n = 50) %>%
+  mutate(Rank_Spotify = row_number())
+
+# Graphique
+ggplot(top_streams, aes(x = Total_Streams/1e6, y = reorder(paste(Rank_Spotify, Artist, sep = " - "), Total_Streams))) +
+  geom_point(size = 3) +
+  geom_text(aes(label = round(Total_Streams/1e6,1)), hjust = -0.5, size = 2.5) +
+  labs(title = "Top 50 artistes - Écoutes Spotify",
+       x = "Nombre d'écoutes (en millions)",
+       y = "Artiste") +
+  scale_x_continuous(labels = comma, expand = expansion(mult = c(0, 0.15))) +
+  theme_minimal() +
+  theme(
+    plot.margin = margin(10, 40, 10, 10),  # marges plus larges à droite
+    axis.text.y = element_text(size = 6)    # textes des artistes plus petits pour aérer
+  )
+```
+On constate que certains artistes affichent des disparités entre vues et streams.Par exemple, Post Malone est premier en nombre de streams Spotify mais se classe seulement 37e en vues YouTube, tandis que CoComelon est deuxième en vues YouTube sans apparaître dans le top Spotify.
+Cela confirme l'idée que la plateforme impacte la visibilité et la consommation de certains artistes.
+```{r, fig.width=8, fig.height=10, dpi=130}
+# Top 50 artistes combiné (Vues + Streams)
+top_combined <- dataset %>%
+  group_by(Artist) %>%
+  summarise(Total_Views = sum(Views, na.rm = TRUE),
+            Total_Streams = sum(Stream, na.rm = TRUE)) %>%
+  mutate(Score = Total_Views + Total_Streams) %>%
+  arrange(desc(Score)) %>%
+  slice_head(n = 50) %>%
+  mutate(Rank_Combined = row_number())
+
+# Graphique
+ggplot(top_combined, aes(x = Score/1e6, y = reorder(paste(Rank_Combined, Artist, sep = " - "), Score))) +
+  geom_point(size = 3) +
+  geom_text(aes(label = round(Score/1e6,1)), hjust = -0.5, size = 2.5) +
+  labs(title = "Top 50 artistes - Score combiné (Vues + Écoutes)",
+       x = "Score combiné (en millions)",
+       y = "Artiste") +
+  scale_x_continuous(labels = comma, expand = expansion(mult = c(0, 0.15))) +
+  theme_minimal() +
+  theme(
+    plot.margin = margin(10, 40, 10, 10),  # marges plus larges à droite
+    axis.text.y = element_text(size = 6)    # textes des artistes plus petits pour aérer
+  )
+```
+On obtient une vision plus complète de la popularité des artistes.
+Certains artistes dominent les deux plateformes de manière équilibrée, tandis que d'autres sont clairement plus forts sur une seule plateforme.
+
+Au sommet du classement on trouve Ed Sheeran avec presque 30 milliards d'interactions,en tête sur les deux plateformes individuellement.
+Des stars internationales remplissent le sommet du top : Justin Bieber, Coldplay, Post Malone Dua Lipa ...
+
+**Observations diverses : **
+- Katy Perry (9ᵉ combiné) est beaucoup plus forte sur YouTube que sur Spotify (typé vidéo/Youtube).
+- Post Malone (4ᵉ combiné) a plus du double de streams Spotify que de vues YouTube (typé audio/Spotify).
+- Luis Fonsi et Daddy Yankee : leur classement est boosté par d'énormes succès vidéo (ex: Despacito) mais leur streaming audio pur est plus faible.
+- CoComelon (contenu enfant) : extrêmement populaire sur YouTube, beaucoup moins sur Spotify (presque anecdotique en streaming pur).
+- Certains artistes comme Coldplay, Imagine Dragons, Bruno Mars performent de façon équilibrée entre plateformes.
+
+La liste montre une très forte dominance de la pop et du hip-hop/RnB mais aussi de quelques artistes de musique latine.
+
+Nous allons analyser les artistes qui figurent uniquement dans l’un des deux classements, cette comparaison permettra de mettre en évidence les artistes qui bénéficient d'une popularité très marquée sur une seule plateforme.(On met le rang)
+
+```{r comparaison_top50, fig.width=14, fig.height=6, dpi=300}
+# Top 50 artistes par vues YouTube
+top_views <- dataset %>%
+  group_by(Artist) %>%
+  summarise(Total_Views = sum(Views, na.rm = TRUE)) %>%
+  arrange(desc(Total_Views)) %>%
+  slice_head(n = 50)
+
+# Top 50 artistes par streams Spotify
+top_streams <- dataset %>%
+  group_by(Artist) %>%
+  summarise(Total_Streams = sum(Stream, na.rm = TRUE)) %>%
+  arrange(desc(Total_Streams)) %>%
+  slice_head(n = 50)
+
+# Artistes dans le top Spotify mais PAS dans le top YouTube
+spotify_only <- setdiff(top_streams$Artist, top_views$Artist)
+
+# Artistes dans le top YouTube mais PAS dans le top Spotify
+youtube_only <- setdiff(top_views$Artist, top_streams$Artist)
+
+# Données pour Spotify only
+spotify_only_dataset <- dataset %>%
+  filter(Artist %in% spotify_only) %>%
+  group_by(Artist) %>%
+  summarise(Total_Views = sum(Views, na.rm = TRUE)) %>%
+  arrange(desc(Total_Views)) 
+
+# Données pour YouTube only
+youtube_only_dataset <- dataset %>%
+  filter(Artist %in% youtube_only) %>%
+  group_by(Artist) %>%
+  summarise(Total_Streams = sum(Stream, na.rm = TRUE)) %>%
+  arrange(desc(Total_Streams))
+
+# Premier graphique : Spotify only (vues YouTube)
+ggplot(spotify_only_dataset, aes(Total_Views/1e6, reorder(Artist, Total_Views))) +
+  geom_point(size = 3, color = "steelblue") +
+  geom_text(aes(label = round(Total_Views/1e6, 1)), hjust = -0.5, size = 2.5) +
+  labs(title = "Artistes Top 50 Spotify (hors Top 50 YouTube)",
+       x = "Nombre de vues YouTube (en millions)",
+       y = "Artiste") +
+  scale_x_continuous(labels = comma, expand = expansion(mult = c(0, 0.15))) +
+  theme_minimal() +
+  theme(
+    axis.text.y = element_text(size = 6),
+    plot.margin = margin(10, 40, 10, 10)
+  )
+
+# Deuxième graphique : YouTube only (streams Spotify)
+ggplot(youtube_only_dataset, aes(Total_Streams/1e6, reorder(Artist, Total_Streams))) +
+  geom_point(size = 3, color = "darkorange") +
+  geom_text(aes(label = round(Total_Streams/1e6, 1)), hjust = -0.5, size = 2.5) +
+  labs(title = "Artistes Top 50 YouTube (hors Top 50 Spotify)",
+       x = "Nombre d'écoutes Spotify (en millions)",
+       y = "Artiste") +
+  scale_x_continuous(labels = comma, expand = expansion(mult = c(0, 0.15))) +
+  theme_minimal() +
+  theme(
+    axis.text.y = element_text(size = 6),
+    plot.margin = margin(10, 40, 10, 10)
+  )
+
+```
+On voit en bas de chaque classement les artistes qui ont de grosses disparités d'interaction entre les plateformes.
+Parmi les artistes du top stream, on voit qu'Olivia Rodrigo ou Doja Cat ont beaucoup moins d'interactions sur YouTube.
+Au contraire, on voit que des artistes ayant un fort succès sur YouTube comme CoComelon ou PSY ont des performances bien moindres sur Spotify.
