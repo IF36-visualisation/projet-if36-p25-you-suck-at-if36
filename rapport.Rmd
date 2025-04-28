@@ -308,8 +308,9 @@ graphe_11_c <- data.frame(avg_Tempo[1],avg_Loudness[2])
 
 ggplot(graphe_11_c, aes(x = Key, y = loudness)) +
   geom_bar(stat = "identity", position = position_dodge(), width = 0.2, fill="deeppink1") + 
+  scale_y_reverse() +
   ggtitle("Graphique 3 : Le Loudness des musiques en fonction de la tonalité") +
-  labs(y = "Loudness (entre 0 et -60 dB)", x = "Tonalité")
+  labs(y = "Loudness (entre 0 et -9 dB)", x = "Tonalité")
 ```
 
 **Observatons diverses**
