@@ -433,7 +433,7 @@ avg_Tempo <- dataset %>%
   summarise(mean_tempo = mean(Tempo, na.rm = TRUE))
 ```
 Affichage du graphique 1
-```
+```{r}
 graphe_11_a <- data.frame(avg_Tempo[1], avg_Valence[2], avg_Liveness[2], avg_Instrumentalness[2], avg_Acousticness[2], avg_Speechiness[2], avg_Energy[2], avg_danceability[2])
 graphe_11_a <- graphe_11_a |>
   pivot_longer(cols = mean_liveness:mean_danceability,
@@ -446,7 +446,7 @@ ggplot(graphe_11_a, aes(x = Key, y = Value, fill = Type)) +
   labs(y = "Score (entre 0 et 1)", x = "Tonalité", fill="Caracteristique")
 ```
 Affichage du graphique 2
-```
+```{r}
 graphe_11_b <- data.frame(avg_Tempo[1],avg_Tempo[2])
 
 ggplot(graphe_11_b, aes(x = Key, y = mean_tempo)) +
@@ -455,7 +455,7 @@ ggplot(graphe_11_b, aes(x = Key, y = mean_tempo)) +
   labs(y = "Tempo (entre 0 et 125 BPM)", x = "Tonalité")
 ```
 Affichage du graphique 3
-```
+```{r}
 graphe_11_c <- data.frame(avg_Tempo[1],avg_Loudness[2])
 
 ggplot(graphe_11_c, aes(x = Key, y = mean_loudness)) +
