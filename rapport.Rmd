@@ -60,6 +60,19 @@ dataset <- read_csv('data/Spotify_Youtube.csv');
 
 ## Analyse detaillée du dataset
 
+### Question 2 : Y a-t-il une corrélation entre la “danceability” et le tempo ?
+```{r}
+dataset %>% ggplot(aes(x=Tempo, y=Danceability)) + 
+  geom_point(alpha=0.3, size=2) + 
+  geom_smooth(method="gam", se=FALSE) +
+  labs(title="Corrélation entre le tempo et la danseabilité", x="Tempo (BPM)", y="Danceability") + 
+  theme_minimal() +
+  theme(
+  plot.title = element_text(hjust=0.5, size=16),
+  axis.title = element_text(size=14),
+  axis.text = element_text(size=12)
+);
+
 ### Question 7 :  Quelles sont les variables qui influencent les performances sur Youtube et les streams Spotify ?
 Heatmap de corrélation
 ```{r}
