@@ -56,9 +56,10 @@ library(scales);
 library(readr);
 library(dplyr);
 library(magrittr);
+library(tidyr);
 ```
 
-## Traitement du dataset
+## Chargement du dataset
 ```{r, warning = FALSE, message = TRUE}
 dataset <- read_csv('data/Spotify_Youtube.csv');
 ```
@@ -192,8 +193,8 @@ Le côté dansant de la musique arrive en $2^e$ position, et semble donc plus im
 **Observations diverses :**
 Nous avons constaté différentes choses intéressantes dans ces visualisations :
 
-* les critères de performance sur Youtube ne sont pas corrélés entre eux
-* certaines features semblent corrélées entre elles
+* les critères de performance sur Youtube ne sont pas corrélés entre eux de manière égale
+* certaines features semblent corrélées entre elles (par exemple, énergy/loudness ou acousticness/loudness)
 
 ***
 
@@ -241,7 +242,10 @@ top_views <- dataset %>%
   mutate(Rank_Youtube = row_number())
 
 # Graphique
-ggplot(top_views, aes(x = Total_Views/1e6, y = reorder(paste(Rank_Youtube, Artist, sep = " - "), Total_Views))) +
+ggplot(top_views, aes(
+  x = Total_Views/1e6,
+  y = reorder(paste(Rank_Youtube, Artist, sep = " - "), Total_Views)
+)) +
   geom_point(size = 3) +
   geom_text(aes(label = round(Total_Views/1e6,1)), hjust = -0.5, size = 2.5) +
   labs(title = "Top 50 artistes - Vues YouTube",
@@ -265,7 +269,10 @@ top_streams <- dataset %>%
   mutate(Rank_Spotify = row_number())
 
 # Graphique
-ggplot(top_streams, aes(x = Total_Streams/1e6, y = reorder(paste(Rank_Spotify, Artist, sep = " - "), Total_Streams))) +
+ggplot(top_streams, aes(
+  x = Total_Streams/1e6,
+  y = reorder(paste(Rank_Spotify, Artist, sep = " - "), Total_Streams)
+)) +
   geom_point(size = 3) +
   geom_text(aes(label = round(Total_Streams/1e6,1)), hjust = -0.5, size = 2.5) +
   labs(title = "Top 50 artistes - Écoutes Spotify",
@@ -292,7 +299,10 @@ top_combined <- dataset %>%
   mutate(Rank_Combined = row_number())
 
 # Graphique
-ggplot(top_combined, aes(x = Score/1e6, y = reorder(paste(Rank_Combined, Artist, sep = " - "), Score))) +
+ggplot(top_combined, aes(
+  x = Score/1e6,
+  y = reorder(paste(Rank_Combined, Artist, sep = " - "), Score)
+)) +
   geom_point(size = 3) +
   geom_text(aes(label = round(Score/1e6,1)), hjust = -0.5, size = 2.5) +
   labs(title = "Top 50 artistes - Score combiné (Vues + Écoutes)",
@@ -434,7 +444,10 @@ avg_Tempo <- dataset %>%
 ```
 Affichage du graphique 1
 ```{r}
-graphe_11_a <- data.frame(avg_Tempo[1], avg_Valence[2], avg_Liveness[2], avg_Instrumentalness[2], avg_Acousticness[2], avg_Speechiness[2], avg_Energy[2], avg_danceability[2])
+graphe_11_a <- data.frame(
+  avg_Tempo[1], avg_Valence[2], avg_Liveness[2], avg_Instrumentalness[2],
+  avg_Acousticness[2], avg_Speechiness[2], avg_Energy[2], avg_danceability[2]
+)
 graphe_11_a <- graphe_11_a |>
   pivot_longer(cols = mean_liveness:mean_danceability,
                names_to = "Type",
