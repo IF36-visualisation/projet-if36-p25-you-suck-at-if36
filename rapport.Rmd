@@ -43,7 +43,7 @@ Ce jeu de données est composé de 20 717 individus, avec 28 features. Le tablea
 | `Licensed` | catégorielle | Indique si la vidéo contient du contenu sous licence officielle revendiquée par un partenaire YouTube. |
 | `official_video` | catégorielle | Valeur booléenne (Vrai/Faux) indiquant si la vidéo YouTube est la vidéo officielle de la chanson. |
 
-Le dataset utilisé est complet et ne devrait pas nécessiter de traitement de données particulier avant son utilisation. Cependant, pour l’analyse de données dans le cadre de notre projet, certaines features ne sont pas nécessaires, tel que : 
+Le dataset utilisé est complet et ne devrait pas nécessiter de traitement de données particulier avant son utilisation. Cependant, pour l’analyse de données dans le cadre de notre projet, certaines features ne sont pas nécessaires, notamment : 
 
 * `Url_spotify`
 * `Uri`  
@@ -72,7 +72,7 @@ dataset <- read_csv('data/Spotify_Youtube.csv');
 dataset %>% ggplot(aes(x=Tempo, y=Danceability)) + 
   geom_point(alpha=0.3, size=2) + 
   geom_smooth(method="gam", se=FALSE) +
-  labs(title="Corrélation entre le tempo et la danseabilité", x="Tempo (BPM)", y="Danceability") + 
+  labs(title="Corrélation entre le tempo et la danceability", x="Tempo (BPM)", y="Danceability") + 
   theme_minimal() +
   theme(
   plot.title = element_text(hjust=0.5, size=16),
@@ -80,7 +80,7 @@ dataset %>% ggplot(aes(x=Tempo, y=Danceability)) +
   axis.text = element_text(size=12)
 );
 ```
-D'après le graphique, on constate qu'il y a une légère corrélation entre le tempo et la danceabilité. En effet, plus le tempo est élevé, plus la danseabilité augmente, jusqu'à un certain point. Au-delà de 120 BPM, la danseabilité semble se stabiliser voir même diminuer. Cela peut s'expliquer par le fait que les morceaux très rapides peuvent devenir trop complexes pour être dansés facilement. Ou encore que l'ensemble des données est très concentré vers les 100 BPM, ce qui fausse la perception de la tendance.
+D'après le graphique, on constate qu'il y a une légère corrélation entre le tempo et la *danceability*. En effet, plus le tempo est élevé, plus la *danceability* augmente, jusqu'à un certain point. Au-delà de 120 BPM, la *danceability* semble se stabiliser voir même diminuer. Cela peut s'expliquer par le fait que les morceaux très rapides peuvent devenir trop complexes pour être dansés facilement. Ou encore que l'ensemble des données est très concentré vers les 100 BPM, ce qui fausse la perception de la tendance.
 
 ``` {r}
 # affichage de la repartition du tempo 
@@ -95,7 +95,7 @@ dataset %>% ggplot(aes(x=Tempo)) +
   );
 
 ```
-En effet on remarque que la forme est similaire à une gaussienne, avec un maximum vers 100 BPM. Cela peut expliquer la tendance observée précédemment. Il n'y aurait donc pas ou très peu de corrélation entre le tempo et la danseabilité.
+En effet on remarque que la forme est similaire à une gaussienne, avec un maximum vers 100 BPM. Cela peut expliquer la tendance observée précédemment. Il n'y aurait donc pas ou très peu de corrélation entre le tempo et la *danceability*.
 
 ### Question 7 :  Quelles sont les variables qui influencent les performances sur Youtube et Spotify ?
 
@@ -189,7 +189,7 @@ correlation %>%
 On remarque deux choses :
 
 - il va falloir réfléchir à notre indicateur de succès puisque les likes et les vues sont plus corrélées entre elles qu'avec le nombre de commentaires
-- les features qui semblent le plus impactantes sur la performance d'une musique sont, comme sur Spotify, l'intensité sonore, l'acoustique, l'instrumentalité avec le côté dansant de la musique.
+- les features qui semblent les plus impactantes sur la performance d'une musique sont, comme sur Spotify, l'intensité sonore, l'acoustique, l'instrumentalité avec le côté dansant de la musique.
 
 De la même façon que précédemment, on affiche la corrélation entre les différentes features et nos indicateurs de performance :
 ```{r}
@@ -211,25 +211,25 @@ Le côté dansant de la musique arrive en $2^e$ position, et semble donc plus im
 Nous avons constaté différentes choses intéressantes dans ces visualisations :
 
 * les critères de performance sur Youtube ne sont pas corrélés entre eux de manière égale
-* certaines features semblent corrélées entre elles (par exemple, énergy/loudness ou acousticness/loudness)
+* certaines features semblent corrélées entre elles (par exemple energy/loudness, energy/acousticness, acousticness/loudness)
 
 ***
 
 ### Question 11 : Est-ce qu'une tonalité a un effet sur le type de chanson ? 
-Dans cette question, nous allons examiner les differentes caracteristiques des musiques pour chaque tonalité. Le but est de voir s'il existe une variation des differentes caracteristiques en fonction de la tonalité globale de la chanson.
+Dans cette question, nous allons examiner les differentes caractéristiques des musiques pour chaque tonalité. Le but est de voir s'il existe une variation des différentes caractéristiques en fonction de la tonalité globale de la chanson.
 
-**Hypotheses**
+**Hypothèses**
 
-Avant de faire des visualisations, nous pouvons supposer que la tonalité a un effet sur certaines caracteristiques, pas toutes. Par exemple, les tonalités majeurs sont plus chaleureuses et festives, tandis que les tonalités minurees donnent un effet plutot nostaligique. Ainsi, nous pouvons supposer que les chansons dans les tonalités majeures vont avoir les features, tel que "danceability" et "energy" plus elevé que les chansons ecrites dans les tonalités mineurs.
+Avant de faire des visualisations, nous pouvons supposer que la tonalité a un effet sur certaines caractéristiques, pas toutes. Par exemple, les tonalités majeures sont plus chaleureuses et festives, tandis que les tonalités mineures donnent un effet plutôt nostaligique. Ainsi, nous pouvons supposer que les chansons dans les tonalités majeures vont avoir les features, tel que "danceability" et "energy" plus importantes que les chansons écrites dans des tonalités mineures.
 
 
 **Traitement des données**
 
-Le dataset, tel qu'il est actuellement, n'est pas adapté a faire une seule visualisation representant tous les caracteristiqus en fonction des tonalités. Voici les deux traitement essentielles à faire, avant de passer à l'etape de visualisation : 
+Le dataset, tel qu'il est actuellement, n'est pas adapté à faire une seule visualisation représentant toutes les caractéristiques en fonction des tonalités. Voici les deux traitement essentiels à faire, avant de passer à l'étape de visualisation : 
 
 
-- Calcul des moyennes pour chaque feature utilisé : afin de pouvoir afficher les caractristiques des chansons en fonction des tonalité en tant qu'un bar chart, il faut les grouper par tonalité et calculer la moyenne.
-- Pivoter le dataset : Afin de colorier les barres par des couleurs differentes en fonction des caractristiques, il faut pivoter le dataset en utilisant la fonction pivot_longer.
+- Calcul des moyennes pour chaque feature utilisée : afin de pouvoir afficher les caractéristiques des chansons en fonction de la tonalité en tant qu'un bar chart, il faut les grouper par tonalité et calculer la moyenne.
+- Pivoter le dataset : Afin de colorier les barres par des couleurs différentes en fonction des caractéristiques, il faut pivoter le dataset en utilisant la fonction pivot_longer.
 ```{r}
 avg_danceability <- dataset %>%
   group_by(Key) %>%
@@ -283,14 +283,14 @@ graphe_11_c <- data.frame(avg_Tempo[1],avg_Loudness[2])
 
 **Visualisation**
 
-Dans le plan d'analyse initial, nous avons proposé de creer un barplot par tonalité. Cependant, cette methode ne sera pas pertinent pour trouver une correlation. Ainsi, un group bar chart est plus adapté. La plupart des caractristiques sont des scores allant entre 0 et 1, sauf le Tempo (entre 0 et 125BPM) et le Loudness (entre -9 et 0 dB). Ainsi, pour garder une bonne lisibilité, nous avons deecidé de fairee 3 graphes : 1 grouped bar chart avec les scores, 1 bar chart avec le Tempo, et 1 bar chart avec le Loudness.
+Dans le plan d'analyse initial, nous avons proposé de creer un barplot par tonalité. Cependant, cette méthode ne sera pas pertinente pour trouver une corrélation. Ainsi, un group bar chart est plus adapté. La plupart des caractéristiques sont des scores allant de 0 à 1, sauf le Tempo (entre 0 et 125BPM) et la Loudness (entre -9 et 0 dB). Ainsi, pour garder une bonne lisibilité, nous avons décidé de faire 3 graphes : 1 grouped bar chart avec les scores, 1 bar chart avec le Tempo, et 1 bar chart avec la Loudness.
 
 
 Affichage du graphique 1
 ```{r}
 ggplot(graphe_11_a, aes(x = Key, y = Value, fill = Type)) +
   geom_bar(stat = "identity", position = position_dodge()) + 
-  ggtitle("Graphique 1 : Les caracteristiques musicales en fonction de la tonalité") +
+  ggtitle("Graphique 1 : Les caractéristiques musicales en fonction de la tonalité") +
   labs(y = "Score (entre 0 et 1)", x = "Tonalité", fill="Caracteristique")
 ```
 
@@ -309,13 +309,13 @@ Affichage du graphique 3
 ggplot(graphe_11_c, aes(x = Key, y = loudness)) +
   geom_bar(stat = "identity", position = position_dodge(), width = 0.2, fill="deeppink1") + 
   scale_y_reverse() +
-  ggtitle("Graphique 3 : Le Loudness des musiques en fonction de la tonalité") +
+  ggtitle("Graphique 3 : La Loudness des musiques en fonction de la tonalité") +
   labs(y = "Loudness (entre 0 et -9 dB)", x = "Tonalité")
 ```
 
-**Observatons diverses**
+**Observations diverses**
 
-D'apres les 3 visualisations ci-dessus, nous pouvons constater que la tonalité n'a pas d'effet sur les caracteristiques musicales.
+D'après les 3 visualisations ci-dessus, nous pouvons constater que la tonalité n'a pas d'effet sur les caractéristiques musicales.
 
 La question a été répondue, mais cette réponse n'est pas la même que dans les hypothèses posées ci-dessus. Ce qui peut être envisagé, c'est de vérifier comment les scores ont été calculés par les algorithmes de Spotify et de YouTube.
 
@@ -332,7 +332,7 @@ On peut imaginer que certains artistes sont beaucoup plus populaires sur une pla
 **Traitement des données :**
 Le datasetset contient 2079 artistes uniques, il est donc préférable d'afficher uniquement les **50 artistes les plus populaires** pour garder des graphiques lisibles.
 
-On constate aussi que certains individus n'ont pas d'url Youtube, ce qui pourrait compremettre la comparaison vues/streams
+On constate aussi que certains individus n'ont pas d'url Youtube, ce qui pourrait compromettre la comparaison vues/streams
 ```{r}
 # nb total de musiques
 total_musiques <- nrow(dataset)
@@ -407,7 +407,7 @@ ggplot(top_streams, aes(
     axis.text.y = element_text(size = 6)    # textes des artistes plus petits pour aérer
   )
 ```
-On constate que certains artistes affichent des disparités entre vues et streams.Par exemple, Post Malone est premier en nombre de streams Spotify mais se classe seulement $37^e$ en vues YouTube, tandis que CoComelon est deuxième en vues YouTube sans apparaître dans le top Spotify.
+On constate que certains artistes affichent des disparités entre vues et streams. Par exemple, Post Malone est premier en nombre de streams Spotify mais se classe seulement $37^e$ en vues YouTube, tandis que CoComelon est deuxième en vues YouTube sans apparaître dans le top Spotify.
 Cela confirme l'idée que la plateforme impacte la visibilité et la consommation de certains artistes.
 ```{r, fig.width=8, fig.height=10, dpi=130}
 # Top 50 artistes combiné (Vues + Streams)
@@ -440,7 +440,7 @@ ggplot(top_combined, aes(
 On obtient une vision plus complète de la popularité des artistes.
 Certains artistes dominent les deux plateformes de manière équilibrée, tandis que d'autres sont clairement plus forts sur une seule plateforme.
 
-Au sommet du classement on trouve Ed Sheeran avec presque 30 milliards d'interactions,en tête sur les deux plateformes individuellement.
+Au sommet du classement on trouve Ed Sheeran avec presque 30 milliards d'interactions, en tête sur les deux plateformes individuellement.
 Des stars internationales remplissent le sommet du top : Justin Bieber, Coldplay, Post Malone Dua Lipa ...
 
 **Observations diverses : **
@@ -453,7 +453,7 @@ Des stars internationales remplissent le sommet du top : Justin Bieber, Coldplay
 
 La liste montre une très forte dominance de la pop et du hip-hop/RnB mais aussi de quelques artistes de musique latine.
 
-Nous allons analyser les artistes qui figurent uniquement dans l’un des deux classements, cette comparaison permettra de mettre en évidence les artistes qui bénéficient d'une popularité très marquée sur une seule plateforme.(On met le rang)
+Nous allons analyser les artistes qui figurent uniquement dans l’un des deux classements, cette comparaison permettra de mettre en évidence les artistes qui bénéficient d'une popularité très marquée sur une seule plateforme. (On met le rang)
 
 ```{r comparaison_top50, fig.width=14, fig.height=6, dpi=300}
 # Top 50 artistes par vues YouTube
