@@ -215,7 +215,7 @@ Nous avons constaté différentes choses intéressantes dans ces visualisations 
 
 ***
 
-### Question 11 : Est-ce qu'une tonbalité a un effet sur le type de chanson ? 
+### Question 11 : Est-ce qu'une tonalité a un effet sur le type de chanson ? 
 Dans cette question, nous allons examiner les differentes caracteristiques des musiques pour chaque tonalité. Le but est de voir s'il existe une variation des differentes caracteristiques en fonction de la tonalité globale de la chanson.
 
 **Hypotheses**
@@ -295,9 +295,9 @@ Affichage du graphique 2
 ```{r}
 graphe_11_b <- data.frame(avg_Tempo[1],avg_Tempo[2])
 
-ggplot(graphe_11_b, aes(x = Key, y = mean_tempo)) +
+ggplot(graphe_11_b, aes(x = Key, y = tempo)) +
   geom_bar(stat = "identity", position = position_dodge(), width = 0.2, fill="darkolivegreen4") + 
-  ggtitle("Graphiuqe 2 : Le Tempo des musiques en fonction de la tonalité") +
+  ggtitle("Graphique 2 : Le Tempo des musiques en fonction de la tonalité") +
   labs(y = "Tempo (entre 0 et 125 BPM)", x = "Tonalité")
 ```
 
@@ -306,7 +306,7 @@ Affichage du graphique 3
 ```{r}
 graphe_11_c <- data.frame(avg_Tempo[1],avg_Loudness[2])
 
-ggplot(graphe_11_c, aes(x = Key, y = mean_loudness)) +
+ggplot(graphe_11_c, aes(x = Key, y = loudness)) +
   geom_bar(stat = "identity", position = position_dodge(), width = 0.2, fill="deeppink1") + 
   ggtitle("Graphique 3 : Le Loudness des musiques en fonction de la tonalité") +
   labs(y = "Loudness (entre 0 et -60 dB)", x = "Tonalité")
