@@ -223,7 +223,7 @@ Dans cette question, nous allons examiner les differentes caracteristiques des m
 Avant de faire des visualisations, nous pouvons supposer que la tonalité a un effet sur certaines caracteristiques, pas toutes. Par exemple, les tonalités majeurs sont plus chaleureuses et festives, tandis que les tonalités minurees donnent un effet plutot nostaligique. Ainsi, nous pouvons supposer que les chansons dans les tonalités majeures vont avoir les features, tel que "danceability" et "energy" plus elevé que les chansons ecrites dans les tonalités mineurs.
 
 
-**Traitement des donnéees**
+**Traitement des données**
 
 Le dataset, tel qu'il est actuellement, n'est pas adapté a faire une seule visualisation representant tous les caracteristiqus en fonction des tonalités. Voici les deux traitement essentielles à faire, avant de passer à l'etape de visualisation : 
 
@@ -317,7 +317,7 @@ ggplot(graphe_11_c, aes(x = Key, y = loudness)) +
 
 D'apres les 3 visualisations ci-dessus, nous pouvons constater que la tonalité n'a pas d'effet sur les caracteristiques musicales.
 
-La question a etait repondu, mais cette reponse n'est pas le meme que dans les hypotheses posés ci-dessus. Ce qui peut etre envisagé, c'est de verifier comment les scores ont etaient calculés par les algorithmes de Spotify et de Youtube.
+La question a été répondue, mais cette réponse n'est pas la même que dans les hypothèses posées ci-dessus.. Ce que peut être envisagé, c'est de verifier comment les scores ont été calculés par les algorithmes de Spotify et de Youtube.
 
 
 ### Question 13 : Quel artiste est le plus populaire au moment du 7 février 2023 ?  
