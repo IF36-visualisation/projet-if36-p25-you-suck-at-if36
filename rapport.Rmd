@@ -307,3 +307,15 @@ avg_Tempo <- dataset %>%
   group_by(Key) %>%
   summarise(mean_tempo = mean(Tempo, na.rm = TRUE))
 ```
+Affichage du graphique
+```
+graphe_11_a <- data.frame(avg_Tempo[1], avg_Valence[2], avg_Liveness[2], avg_Instrumentalness[2], avg_Acousticness[2], avg_Speechiness[2]ed, avg_Energy[2], avg_danceability[2])
+head(df)
+graphe_11_a <- graphe_11_a |>
+  pivot_longer(cols = mean_liveness:mean_danceability,
+               names_to = "Type",
+               values_to = "Value")
+ggplot(graphe_11_a, aes(x = Key, y = Value, fill = Type)) +
+  geom_bar(stat = "identity", position = position_dodge())
+```
+
