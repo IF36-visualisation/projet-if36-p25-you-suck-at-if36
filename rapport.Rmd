@@ -55,7 +55,7 @@ Le dataset utilisé est complet et ne devrait pas nécessiter de traitement de d
 * `Description`
 
 ## Chargement des Librairies utilisées
-```{r, warning = FALSE, message = FALSE}
+```{r libraries, message=FALSE, warning=FALSE}
 library(ggplot2);
 library(scales);
 library(readr);
@@ -66,14 +66,14 @@ library(boot);
 ```
 
 ## Chargement du dataset
-```{r, warning = FALSE, message = TRUE}
+```{r dataset, message=FALSE, warning=FALSE}
 dataset <- read_csv('/Users/klim/Downloads/Spotify_Youtube.csv');
 ```
 
 ## Analyse detaillée du dataset
 
 ### Question 2 : Y a-t-il une corrélation entre la “danceability” et le tempo ?
-```{r}
+```{r message=FALSE, warning=FALSE}
 dataset %>% ggplot(aes(x=Tempo, y=Danceability)) + 
   geom_point(alpha=0.3, size=2) + 
   geom_smooth(method="gam", se=FALSE) +
@@ -87,7 +87,7 @@ dataset %>% ggplot(aes(x=Tempo, y=Danceability)) +
 ```
 D'après le graphique, on constate qu'il y a une légère corrélation entre le tempo et la *danceability*. En effet, plus le tempo est élevé, plus la *danceability* augmente, jusqu'à un certain point. Au-delà de 120 BPM, la *danceability* semble se stabiliser voir même diminuer. Cela peut s'expliquer par le fait que les morceaux très rapides peuvent devenir trop complexes pour être dansés facilement. Ou encore que l'ensemble des données est très concentré vers les 100 BPM, ce qui fausse la perception de la tendance.
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 # affichage de la repartition du tempo 
 dataset %>% ggplot(aes(x=Tempo)) + 
   geom_histogram(binwidth=5, fill="steelblue", color="black", alpha=0.7) +
@@ -115,7 +115,7 @@ Certaines features, comme l'énergie ou le tempo sont peut être corrélées ave
 **Traitement des données :**
 Nous souhaitons réaliser une heatmap de la corrélation entre les features et les performances des musiques. Puisque la performance ne se mesure pas de la même façon sur les deux plateformes, nous allons faire deux heatmaps et donc séparer le dataset en deux : les musiques présentes sur Spotify et les musiques présentes sur Youtube. \
 Afin de calculer correctement la corrélation entre les différentes features et les indices de performance, on enlève également toutes les musiques dont au moins une feature est absente de notre dataset.
-```{r}
+```{r message=FALSE, warning=FALSE}
 # Commençons par Spotify
 spotify_dataset <- dataset %>%
   filter(!is.na(Stream)) %>% # On retire les musiques qui n'ont pas de nombre de streams
@@ -137,7 +137,7 @@ On va donc visualiser les données de $20140$ musiques pour Spotify et $20099$ m
 
 **Visualisations :**
 Faisons d'abord une heatmap pour montrer la corrélation entre les différentes features et la performance des musiques sur Spotify :
-```{r}
+```{r message=FALSE, warning=FALSE}
 correlation <- spotify_dataset %>%
   cor(method="pearson") %>% # Dressons une matrice de corrélation en utilisant les valeurs
   as.table() %>% # On transforme la matrice en un tableau contenant la ligne, la colonne et la valeur
@@ -158,7 +158,7 @@ correlation %>%
 On constate déjà que la performance sur Spotify *(Stream)* est très peu corrélée avec les différentes features des musiques. On voit que la corrélation la plus élevée reste très faible (~15%) et concerne l'intensité sonore, l'acoustique et l'instrumentalité.
 
 Afin d'y voir plus clair, nous allons réaliser un *BarPlot* des features pour afficher leur corrélation avec le nombre de streams :
-```{r}
+```{r message=FALSE, warning=FALSE}
 columns <- c("Stream", "Views", "Likes", "Comments")
 correlation %>%
   filter(Var1 %in% columns & !Var2 %in% columns) %>%
@@ -175,7 +175,7 @@ On peut désormais classer plus facilement les différentes features en ordre d'
 Cependant, ces valeurs restent faibles (environ 10% de corrélation) : il n'y a donc pas de recette miracle pour percer sur Spotify !
 
 Regardons maintenant ce qu'il en est sur Youtube. On souhaite regarder ici la corrélation entre les différentes features et le nombre de vues, de likes et de commentaires :
-```{r}
+```{r message=FALSE, warning=FALSE}
 correlation <- youtube_dataset %>%
   cor(method="pearson") %>%
   as.table() %>%
@@ -199,7 +199,7 @@ On remarque deux choses :
 - les features qui semblent les plus impactantes sur la performance d'une musique sont, comme sur Spotify, l'intensité sonore, l'acoustique, l'instrumentalité avec le côté dansant de la musique.
 
 De la même façon que précédemment, on affiche la corrélation entre les différentes features et nos indicateurs de performance :
-```{r}
+```{r message=FALSE, warning=FALSE}
 columns <- c("Stream", "Views", "Likes", "Comments")
 correlation %>%
   filter(Var1 %in% columns & !Var2 %in% columns) %>%
@@ -237,7 +237,7 @@ Le dataset, tel qu'il est actuellement, n'est pas adapté à faire une seule vis
 
 - Calcul des moyennes pour chaque feature utilisée : afin de pouvoir afficher les caractéristiques des chansons en fonction de la tonalité en tant qu'un bar chart, il faut les grouper par tonalité et calculer la moyenne.
 - Pivoter le dataset : Afin de colorier les barres par des couleurs différentes en fonction des caractéristiques, il faut pivoter le dataset en utilisant la fonction pivot_longer.
-```{r}
+```{r message=FALSE, warning=FALSE}
 avg_danceability <- dataset %>%
   group_by(Key) %>%
   summarise(danceability = mean(Danceability, na.rm = TRUE))
@@ -294,7 +294,7 @@ Dans le plan d'analyse initial, nous avons proposé de creer un barplot par tona
 
 
 Affichage du graphique 1
-```{r}
+```{r message=FALSE, warning=FALSE}
 ggplot(graphe_11_a, aes(x = Key, y = Value, fill = Type)) +
   geom_bar(stat = "identity", position = position_dodge()) + 
   ggtitle("Graphique 1 : Les caractéristiques musicales en fonction de la tonalité") +
@@ -303,7 +303,7 @@ ggplot(graphe_11_a, aes(x = Key, y = Value, fill = Type)) +
 
 
 Affichage du graphique 2
-```{r}
+```{r message=FALSE, warning=FALSE}
 ggplot(graphe_11_b, aes(x = Key, y = tempo)) +
   geom_bar(stat = "identity", position = position_dodge(), width = 0.2, fill="darkolivegreen4") + 
   ggtitle("Graphique 2 : Le Tempo des musiques en fonction de la tonalité") +
@@ -312,7 +312,7 @@ ggplot(graphe_11_b, aes(x = Key, y = tempo)) +
 
 
 Affichage du graphique 3
-```{r}
+```{r message=FALSE, warning=FALSE}
 ggplot(graphe_11_c, aes(x = Key, y = loudness)) +
   geom_bar(stat = "identity", position = position_dodge(), width = 0.2, fill="deeppink1") + 
   scale_y_reverse() +
@@ -341,7 +341,7 @@ On peut imaginer que certains artistes sont beaucoup plus populaires sur une pla
 Le datasetset contient 2079 artistes uniques, il est donc préférable d'afficher uniquement les **50 artistes les plus populaires** pour garder des graphiques lisibles.
 
 On constate aussi que certains individus n'ont pas d'url Youtube, ce qui pourrait compromettre la comparaison vues/streams
-```{r}
+```{r message=FALSE, warning=FALSE}
 # nb total de musiques
 total_musiques <- nrow(dataset)
 # nb d'individus sans vidéos youtube
@@ -354,7 +354,7 @@ cat("Nombre de musiques sans vidéos YouTube :", total_sans_ytb, "\n")
 cat("Pourcentage de musiques sans vidéos YouTube :", round(pourcentage_sans_ytb, 2), "%\n")
 ```
 Étant donné que seulement $2,27%$ des musiques ne disposent pas de données YouTube, nous avons décidé de les supprimer sans risque d'altérer l'analyse globale.
-```{r}
+```{r message=FALSE, warning=FALSE}
 # Suppression des musiques sans URL YouTube
 dataset <- dataset[dataset$Url_youtube != '',]
 total_musiques <- nrow(dataset)
@@ -362,7 +362,7 @@ cat("Nombre total de musiques après suppression :", total_musiques, "\n")
 ```
 **Visualisations :**
 
-```{r, fig.width=8, fig.height=10, dpi=130}
+```{r message=FALSE, warning=FALSE, fig.height=10, fig.width=8, dpi=130}
 # Top 50 artistes selon les vues YouTube
 top_views <- dataset %>%
   group_by(Artist) %>%
@@ -389,7 +389,7 @@ ggplot(top_views, aes(
   )
 ```
 
-```{r, fig.width=8, fig.height=10, dpi=130}
+```{r message=FALSE, warning=FALSE, fig.height=10, fig.width=8, dpi=130}
 # Top 50 artistes selon les streams Spotify
 top_streams <- dataset %>%
   group_by(Artist) %>%
@@ -417,7 +417,7 @@ ggplot(top_streams, aes(
 ```
 On constate que certains artistes affichent des disparités entre vues et streams. Par exemple, Post Malone est premier en nombre de streams Spotify mais se classe seulement $37^e$ en vues YouTube, tandis que CoComelon est deuxième en vues YouTube sans apparaître dans le top Spotify.
 Cela confirme l'idée que la plateforme impacte la visibilité et la consommation de certains artistes.
-```{r, fig.width=8, fig.height=10, dpi=130}
+```{r message=FALSE, warning=FALSE, fig.height=10, fig.width=8, dpi=130}
 # Top 50 artistes combiné (Vues + Streams)
 top_combined <- dataset %>%
   group_by(Artist) %>%
@@ -463,7 +463,7 @@ La liste montre une très forte dominance de la pop et du hip-hop/RnB mais aussi
 
 Nous allons analyser les artistes qui figurent uniquement dans l’un des deux classements, cette comparaison permettra de mettre en évidence les artistes qui bénéficient d'une popularité très marquée sur une seule plateforme. (On met le rang)
 
-```{r comparaison_top50, fig.width=14, fig.height=6, dpi=300}
+```{r comparaison_top50, message=FALSE, warning=FALSE, fig.height=6, fig.width=14, dpi=300}
 # Top 50 artistes par vues YouTube
 top_views <- dataset %>%
   group_by(Artist) %>%
@@ -530,5 +530,3 @@ ggplot(youtube_only_dataset, aes(Total_Streams/1e6, reorder(Artist, Total_Stream
 On voit en bas de chaque classement les artistes qui ont de grosses disparités d'interaction entre les plateformes.
 Parmi les artistes du top stream, on voit qu'Olivia Rodrigo ou Doja Cat ont beaucoup moins d'interactions sur YouTube.
 Au contraire, on voit que des artistes ayant un fort succès sur YouTube comme CoComelon ou PSY ont des performances bien moindres sur Spotify.
-
-
