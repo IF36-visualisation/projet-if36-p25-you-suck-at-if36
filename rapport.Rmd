@@ -3,8 +3,10 @@ title: "Rapport"
 author: "Alban Souchard, Paul Fernandez, Thomas Matamba, Klimentiy Mirek"
 date: "2025-04-23"
 output:
-  pdf_document: default
-  html_document: default
+  prettydoc::html_pretty:
+    theme: architect
+    highlight: github
+    
 ---
 # IF36 \- Proposition
 
@@ -60,11 +62,12 @@ library(readr);
 library(dplyr);
 library(magrittr);
 library(tidyr);
+library(boot);
 ```
 
 ## Chargement du dataset
 ```{r, warning = FALSE, message = TRUE}
-dataset <- read_csv('data/Spotify_Youtube.csv');
+dataset <- read_csv('/Users/klim/Downloads/Spotify_Youtube.csv');
 ```
 
 ## Analyse detaillée du dataset
