@@ -67,24 +67,43 @@ library(boot);
 
 ## Chargement du dataset
 ```{r dataset, message=FALSE, warning=FALSE}
-dataset <- read_csv('/Users/klim/Downloads/Spotify_Youtube.csv');
+dataset <- read_csv('data/Spotify_Youtube.csv');
 ```
 
 ## Analyse detaillée du dataset
 
 ### Question 2 : Y a-t-il une corrélation entre la “danceability” et le tempo ?
+
+**Hypothèse **
+
+La *danceability* est un score qui indique à quel point une chanson est adaptée à la danse. Il est donc logique de penser qu'il existe une certaine corrélation entre le tempo et la *danceability*. En effet, un morceau avec un tempo rapide pourrait être plus dansant qu'un morceau avec un tempo lent.
+
+**Traitement **
+
+Pour réaliser cela nous allons utiliser un scatter plot ainsi qu'une courbe de tendance pour permettre d'identifier plus facilement si une tendance existe.
+Nous allons également supprimer les valeurs anormales, c'est-à-dire les morceaux avec un tempo inférieur à 20 BPM ou supérieur à 250 BPM. En effet, ces morceaux sont très rares et pourraient fausser notre analyse.
+
+
 ```{r message=FALSE, warning=FALSE}
-dataset %>% ggplot(aes(x=Tempo, y=Danceability)) + 
-  geom_point(alpha=0.3, size=2) + 
-  geom_smooth(method="gam", se=FALSE) +
+dataset %>% 
+  filter((Tempo > 20 & Tempo < 250)) %>%
+  ggplot(aes(x=Tempo, y=Danceability)) + 
+  geom_hex(bins = 50) + 
+  scale_fill_viridis_c() +
+  geom_smooth(method="gam", se=FALSE, size = 1.5, color = "#FDE725") +
   labs(title="Corrélation entre le tempo et la danceability", x="Tempo (BPM)", y="Danceability") + 
   theme_minimal() +
   theme(
-  plot.title = element_text(hjust=0.5, size=16),
-  axis.title = element_text(size=14),
-  axis.text = element_text(size=12)
+    plot.title = element_text(hjust = 0.5, size = 18, face = "bold"),
+    axis.title = element_text(size = 14),
+    axis.text = element_text(size = 12),
+    panel.grid.major = element_line(color = "gray80"),
+    panel.grid.minor = element_blank(),
 );
 ```
+
+**Observations **
+
 D'après le graphique, on constate qu'il y a une légère corrélation entre le tempo et la *danceability*. En effet, plus le tempo est élevé, plus la *danceability* augmente, jusqu'à un certain point. Au-delà de 120 BPM, la *danceability* semble se stabiliser voir même diminuer. Cela peut s'expliquer par le fait que les morceaux très rapides peuvent devenir trop complexes pour être dansés facilement. Ou encore que l'ensemble des données est très concentré vers les 100 BPM, ce qui fausse la perception de la tendance.
 
 ```{r message=FALSE, warning=FALSE}
@@ -94,13 +113,82 @@ dataset %>% ggplot(aes(x=Tempo)) +
   labs(title="Répartition du tempo", x="Tempo (BPM)", y="Nombre de morceaux") + 
   theme_minimal() +
   theme(
-    plot.title = element_text(hjust=0.5, size=16),
+    plot.title = element_text(hjust=0.5, size=18, face="bold"),
     axis.title = element_text(size=14),
     axis.text = element_text(size=12)
   );
 
 ```
+
 En effet on remarque que la forme est similaire à une gaussienne, avec un maximum vers 100 BPM. Cela peut expliquer la tendance observée précédemment. Il n'y aurait donc pas ou très peu de corrélation entre le tempo et la *danceability*.
+
+***
+### Question 4 : Les chansons live ont-elles tendance à avoir plus de vue sur Youtube que Spotify ?
+
+**Hypothèse **
+
+On peut imaginer que les chansons live sont plus populaires sur Youtube que sur Spotify, car Youtube est une plateforme de vidéo et de contenu visuel. De plus, les concerts et les performances live sont souvent partagés sur Youtube, ce qui pourrait expliquer une tendance à avoir plus de vues sur cette plateforme.
+
+**Traitement des données **
+
+Nous allons créer deux boxplot pour comparer le nombre de vues sur Youtube et Spotify pour les chansons live et non-live (studio).
+Nous allons également créer une nouvelle variable pour différencier les morceaux live et studio à l'aide de la feature *Liveness*. En effet, cette feature indique si le morceau a été enregistré en live ou non. Nous allons donc créer une nouvelle variable *is_live* qui prendra la valeur "Live" si la valeur de *Liveness* est supérieure à 0.8, et "Studio" sinon.
+L'affichage des boxplots se fera suivant une échelle logarithmique, afin de mieux visualiser les différences entre les deux plateformes.
+
+```{r message=FALSE, warning=FALSE}
+# Afficher le nombre de musiques live
+live_music <- dataset %>% filter(Liveness > 0.8) %>% select(contains("Stream"), contains("Views"));
+print(paste("Nombre de musiques live :", nrow(live_music)))
+
+```
+
+Nous remarquons que le nombre de musique live n'est que de 385, soit environ 2% du dataset. Les résultats pourraient donc être biaisés par le faible nombre de musiques live.
+
+
+``` {r message=FALSE, warning=FALSE}
+# Crée une variable pour différencier les morceaux live et studio
+dataset <- dataset %>%
+  filter(!is.na(Liveness)) %>%
+  mutate(is_live = ifelse(Liveness > 0.8, "Live", "Studio"))
+
+# Crée une fonction pour créer les boxplots
+plot_boxplot <- function(data, yvar, ylab, title, subtitle) {
+  ggplot(data, aes_string(x = "is_live", y = yvar, fill = "is_live")) +
+    geom_boxplot(outlier.shape = NA,size = 0.7) +
+    scale_y_log10(labels = scales::comma) +
+    labs(
+      title = title,
+      subtitle = subtitle,
+      x = "Type de chanson",
+      y = ylab,
+    ) +
+    theme_minimal() +
+    theme(
+      plot.title = element_text(size = 18, hjust = 0.5, face = "bold"),
+      plot.subtitle = element_text(size = 13, hjust = 0.5),
+      axis.title = element_text(size = 14),
+      axis.text = element_text(size = 12),
+
+    ) +
+    guides(fill = "none")
+}
+
+# Appel de la fonction pour créer les boxplots
+plot_streams <- plot_boxplot(dataset, "Stream", "Nombre d'écoutes (log)", 
+                             "Comparaison des écoutes Spotify", "Entre chansons Live et Studio")
+
+plot_views <- plot_boxplot(dataset, "Views", "Nombre de vues (log)", 
+                          "Comparaison des vues YouTube", "Entre chansons Live et Studio")
+
+plot_streams
+plot_views
+
+```
+
+**Observations **
+
+D'après les boxplots, on constate que les morceaux live ont tendance à avoir plus de vues sur Youtube que sur Spotify. En effet, les médianes des vues Youtubes sont très similaires, mais les morceaux live ont une plus grande amplitude de vues sur Youtube que sur Spotify.
+Cela peut confirmer l'hypothèse selon laquelle les morceaux live sont plus populaires sur Youtube que sur Spotify. Cependant, il est important de noter que le nombre de morceaux live est très faible par rapport au nombre total de morceaux, ce qui peut fausser les résultats. De plus, il est possible que d'autres facteurs influencent le nombre de vues et d'écoutes, tels que la popularité de l'artiste ou la qualité de la vidéo.
 
 ***
 
