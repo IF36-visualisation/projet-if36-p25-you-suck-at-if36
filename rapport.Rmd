@@ -6,7 +6,6 @@ output:
   prettydoc::html_pretty:
     theme: architect
     highlight: github
-    
 ---
 # IF36 \- Proposition
 
@@ -63,6 +62,10 @@ library(dplyr);
 library(magrittr);
 library(tidyr);
 library(boot);
+
+## Define theme colors to use for graphs
+theme <- "#63a0e1";
+darktheme <- "#2e7bcf";
 ```
 
 ## Chargement du dataset
@@ -123,6 +126,112 @@ dataset %>% ggplot(aes(x=Tempo)) +
 En effet on remarque que la forme est similaire à une gaussienne, avec un maximum vers 100 BPM. Cela peut expliquer la tendance observée précédemment. Il n'y aurait donc pas ou très peu de corrélation entre le tempo et la *danceability*.
 
 ***
+### Question 3 : Quelle est la distribution des émotions (valence) des chansons ?
+
+**Hypothèse :**
+
+On souhaite savoir si les morceaux sont globalement joyeux ou tristes. On peut imaginer que certains types de musique sont plus présents sur une plateforme que sur l'autre, par exemple plus de musiques joyeuses sur Youtube et plus de musiques tristes sur Spotify.
+
+**Traitement des données**
+
+On filtre les valeurs de valence pour que la valence soit toujours comprise entre 0 et 1 et on sépare les musiques selon si elles sont présentes sur Spotify ou Youtube.
+
+```{r message=FALSE, warning=FALSE}
+spotify_dataset <- dataset %>%
+  filter(Valence >= 0 & Valence <= 1 & !is.na(Stream)) %>%
+  select(Valence) %>%
+  na.omit();
+youtube_dataset <- dataset %>%
+  filter(Valence >= 0 & Valence <= 1 & !is.na(Views)) %>%
+  select(Valence) %>%
+  na.omit();
+```
+
+**Visualisations :**
+
+```{r message=FALSE, warning=FALSE}
+# Création de l'histogramme avec courbe de densité
+spotify_dataset %>% ggplot(aes(x = Valence)) +
+  geom_histogram(aes(y = ..density..), bins = 30, fill = theme, color = "white", alpha = 0.7) +
+  geom_density(color = darktheme, size = 1) +
+  labs(
+    title = "Distribution des émotions (valence) des chansons sur Spotify",
+    x = "Valence (0 = triste, 1 = joyeux)",
+    y = "Densité"
+  ) +
+  theme_minimal()
+youtube_dataset %>% ggplot(aes(x = Valence)) +
+  geom_histogram(aes(y = ..density..), bins = 30, fill = theme, color = "white", alpha = 0.7) +
+  geom_density(color = darktheme, size = 1) +
+  labs(
+    title = "Distribution des émotions (valence) des chansons sur Youtube",
+    x = "Valence (0 = triste, 1 = joyeux)",
+    y = "Densité"
+  ) +
+  theme_minimal()
+```
+
+Les résultats de ces premiers graphiques montrent que les musiques présentes sur les deux plateformes sont plus joyeuses que tristes. Cela dit, il pourrait être intéressant de connaitre :
+
+- le pourcentage de musiques plutôt joyeuse ($Valence > 0,5$)
+- la valence moyenne des musiques du dataset
+- la répartition de la valence des musiques présentes exclusivement sur l'une des deux plateformes (puisqu'on a $19673$ musiques qui sont communes aux deux plateformes)
+
+**Déterminons le pourcentage de musiques plutôt joyeuses dans le dataset** 
+
+```{r message=FALSE, warning=FALSE}
+dataset %>% filter(Valence > 0.5) %>% nrow() / dataset %>% nrow()
+```
+
+Les musiques sont donc de manière générale plus joyeuses que tristes dans notre dataset.
+
+**Déterminons la valence moyenne des musiques**
+
+```{r message=FALSE, warning=FALSE}
+dataset$Valence %>% mean(na.rm = TRUE);
+```
+
+**Trouvons la répartition de la valence des musiques présentes uniquement sur l'une des deux platformes**
+
+```{r message=FALSE, warning=FALSE}
+spotify_only_dataset <- dataset %>%
+  filter(Valence >= 0 & Valence <= 1 & is.na(Views)) %>%
+  select(Valence) %>%
+  na.omit();
+youtube_only_dataset <- dataset %>%
+  filter(Valence >= 0 & Valence <= 1 & is.na(Stream)) %>%
+  select(Valence) %>%
+  na.omit();
+spotify_only_dataset %>% ggplot(aes(x = Valence)) +
+  geom_histogram(aes(y = ..density..), bins = 30, fill = theme, color = "white", alpha = 0.7) +
+  geom_density(color = darktheme, size = 1) +
+  labs(
+    title = "Distribution de la valence des chansons présentes exclusivement sur Spotify",
+    x = "Valence (0 = triste, 1 = joyeux)",
+    y = "Densité"
+  ) +
+  theme_minimal()
+youtube_only_dataset %>% ggplot(aes(x = Valence)) +
+  geom_histogram(aes(y = ..density..), bins = 30, fill = theme, color = "white", alpha = 0.7) +
+  geom_density(color = darktheme, size = 1) +
+  labs(
+    title = "Distribution de la valence des chansons présentes exclusivement sur Youtube",
+    x = "Valence (0 = triste, 1 = joyeux)",
+    y = "Densité"
+  ) +
+  theme_minimal()
+```
+
+Pour rappel, ces graphiques se basent sur peu de données, à savoir sur $469$ valeurs pour Spotify et $576$ valeurs pour Youtube.
+
+```{r message=FALSE, warning=FALSE}
+nrow(spotify_only_dataset);
+nrow(youtube_only_dataset);
+```
+
+Il apparait cependant que les musiques présentes uniquement sur Spotify ont tendance à avoir une valence répartie autour de $0,7$ : ce sont donc des musiques relativement joyeuses; là où les musiques présentes exclusivement sur Youtube ont une valence mieux répartie, incluant ainsi plus de musiques plus joyeuses et plus de musiques plus tristes que sur Spotify.
+
+***
 ### Question 4 : Les chansons live ont-elles tendance à avoir plus de vue sur Youtube que Spotify ?
 
 **Hypothèse **
@@ -144,10 +253,11 @@ print(paste("Nombre de musiques live :", nrow(live_music)))
 
 Nous remarquons que le nombre de musique live n'est que de 385, soit environ 2% du dataset. Les résultats pourraient donc être biaisés par le faible nombre de musiques live.
 
+**Visualisations :**
 
 ``` {r message=FALSE, warning=FALSE}
 # Crée une variable pour différencier les morceaux live et studio
-dataset <- dataset %>%
+live_dataset <- dataset %>%
   filter(!is.na(Liveness)) %>%
   mutate(is_live = ifelse(Liveness > 0.8, "Live", "Studio"))
 
@@ -174,10 +284,10 @@ plot_boxplot <- function(data, yvar, ylab, title, subtitle) {
 }
 
 # Appel de la fonction pour créer les boxplots
-plot_streams <- plot_boxplot(dataset, "Stream", "Nombre d'écoutes (log)", 
+plot_streams <- plot_boxplot(live_dataset, "Stream", "Nombre d'écoutes (log)", 
                              "Comparaison des écoutes Spotify", "Entre chansons Live et Studio")
 
-plot_views <- plot_boxplot(dataset, "Views", "Nombre de vues (log)", 
+plot_views <- plot_boxplot(live_dataset, "Views", "Nombre de vues (log)", 
                           "Comparaison des vues YouTube", "Entre chansons Live et Studio")
 
 plot_streams
@@ -221,6 +331,7 @@ youtube_dataset %>%
   nrow() %>%
   print();
 ```
+
 On va donc visualiser les données de $20140$ musiques pour Spotify et $20099$ musiques pour Youtube.
 
 **Visualisations :**
@@ -243,9 +354,11 @@ correlation %>%
   ggtitle("Corrélation entre les différentes features et les performances sur Spotify") +
   labs(fill="Indice de\ncorrélation");
 ```
+
 On constate déjà que la performance sur Spotify *(Stream)* est très peu corrélée avec les différentes features des musiques. On voit que la corrélation la plus élevée reste très faible (~15%) et concerne l'intensité sonore, l'acoustique et l'instrumentalité.
 
 Afin d'y voir plus clair, nous allons réaliser un *BarPlot* des features pour afficher leur corrélation avec le nombre de streams :
+
 ```{r message=FALSE, warning=FALSE}
 columns <- c("Stream", "Views", "Likes", "Comments")
 correlation %>%
@@ -259,10 +372,12 @@ correlation %>%
   labs(x="Feature", y="Corrélation", fill="Performance") +
   ggtitle("Importance des features dans la performance de la musique sur Spotify");
 ```
+
 On peut désormais classer plus facilement les différentes features en ordre d'importance : *Loudness* puis *Acousticness* puis *Instrumentalness*. \
 Cependant, ces valeurs restent faibles (environ 10% de corrélation) : il n'y a donc pas de recette miracle pour percer sur Spotify !
 
 Regardons maintenant ce qu'il en est sur Youtube. On souhaite regarder ici la corrélation entre les différentes features et le nombre de vues, de likes et de commentaires :
+
 ```{r message=FALSE, warning=FALSE}
 correlation <- youtube_dataset %>%
   cor(method="pearson") %>%
@@ -281,12 +396,14 @@ correlation %>%
   ggtitle("Corrélation entre les différentes features et les performances sur Youtube") +
   labs(fill="Indice de\ncorrélation");
 ```
+
 On remarque deux choses :
 
 - il va falloir réfléchir à notre indicateur de succès puisque les likes et les vues sont plus corrélées entre elles qu'avec le nombre de commentaires
 - les features qui semblent les plus impactantes sur la performance d'une musique sont, comme sur Spotify, l'intensité sonore, l'acoustique, l'instrumentalité avec le côté dansant de la musique.
 
 De la même façon que précédemment, on affiche la corrélation entre les différentes features et nos indicateurs de performance :
+
 ```{r message=FALSE, warning=FALSE}
 columns <- c("Stream", "Views", "Likes", "Comments")
 correlation %>%
@@ -300,16 +417,104 @@ correlation %>%
   labs(x="Feature", y="Corrélation", fill="Performance") +
   ggtitle("Importance des features dans la performance de la musique sur Youtube");
 ```
+
 Le côté dansant de la musique arrive en $2^e$ position, et semble donc plus important que sur Spotify. Cela dit, cela reste à nuancer puisque la corrélation reste très faible. Ainsi, comme sur Spotify, nous n'avons pas encore trouvé la recette du succès sur Youtube.
 
 **Observations diverses :**
-Nous avons constaté différentes choses intéressantes dans ces visualisations :
+Nous avons constaté différentes choses intéressantes dans ces visualisations:
 
 * les critères de performance sur Youtube ne sont pas corrélés entre eux de manière égale
 * certaines features semblent corrélées entre elles (par exemple energy/loudness, energy/acousticness, acousticness/loudness)
 
 ***
 
+### Question 9 : Quelle est la tonalité la plus fréquente dans les chansons du dataset ?
+
+**Hypothèse**
+
+Certaines tonalités sont peut être plus présentes que d'autres dans le dataset.
+
+**Traitement des données**
+
+Afin de pouvoir utiliser les données correctement et d'afficher les résultats de manière lisible, on va transformer les codes des différentes tonalités en leur valeur (ex. 0 = Do). Par la même occasion, on crée une catégorie pour les musiques dont la tonalité n'a pas pu être déterminée. On retire également les colonnes inutiles.
+
+```{r message=FALSE, warning=FALSE}
+keys <- dataset %>% select(Key, Views, Stream, Likes, Comments) %>% mutate(Key=replace_na(Key, 12));
+note_labels <- c(
+  "Do",
+  "Do♯/Ré♭",
+  "Ré",
+  "Ré♯/Mi♭",
+  "Mi",
+  "Fa",
+  "Fa♯/Sol♭",
+  "Sol",
+  "Sol♯/La♭",
+  "La",
+  "La♯/Si♭",
+  "Si",
+  "Tonalité inconnue"
+);
+keys$Key <- factor(keys$Key, levels = 0:12, labels = note_labels);
+keys_only <- keys %>% select(Key);
+```
+
+**Visualisations**
+
+Nous allons compter le nombre de musiques pour chaque tonalité, et afficher les résultats à l'aide d'un barchart.
+
+```{r message=FALSE, warning=FALSE}
+keys_only %>% ggplot(aes(x = Key)) +
+  geom_bar(fill = theme, color = 'white', width=1) +
+  labs(
+    title = "Distribution des tonalités",
+    x = "Tonalité",
+    y = "Nombre de musiques"
+  ) +
+  theme(
+    axis.text.x = element_text(angle = 90, vjust = 0.4, hjust = 0.9),
+    plot.title = element_text(size=12)
+  );
+```
+
+On constate que certaines tonalités sont légèrement plus présentes que les autres sur les plateformes Youtube et Spotify, comme le Do, Sol, Do♯/Ré♭, Ré et La.
+
+On remarque également qu'il y a nettement moins de musiques avec la tonalité Ré♯/Mi♭. On va tenter de voir s'il existe des corrélations entre le succès d'une musique et sa tonalité, ce qui pourrait expliquer le faible nombre de musiques en Ré♯/Mi♭.
+
+```{r message=FALSE, warning=FALSE, fig.height=3}
+keys %>% filter(Key != note_labels[13]) %>% group_by(Key) %>% summarise(
+  Streams=mean(Stream, na.rm=TRUE), Likes=mean(Likes, na.rm=TRUE),
+  Comments=mean(Comments, na.rm=TRUE), Views=mean(Views, na.rm=TRUE)
+) %>% mutate(across(where(is.numeric),
+  ~ (. - min(., na.rm = TRUE)) / (max(., na.rm = TRUE) - min(., na.rm = TRUE)))
+) %>% pivot_longer(
+  cols=c(Streams, Likes, Comments, Views), names_to="Stat", values_to="Value"
+) %>% ggplot(aes(x=Key, y=Stat, fill=Value)) +
+  geom_tile() +
+  scale_fill_viridis_c(option="inferno") +
+  theme(
+    axis.title=element_blank(),
+    axis.text.x = element_text(angle = 90, vjust = 0.4, hjust = 0.9),
+    plot.title = element_text(size=12)
+  ) +
+  ggtitle("Succès moyen de la musique selon la tonalité") +
+  labs(fill="Succès\n(normalisé)");
+```
+
+Afin de mieux comprendre l'échelle utilisée dans ce graphique, on a calculé la différence entre la valeur la plus foncée et la valeur la plus claire :
+
+| Critère | Views | Streams | Likes | Comments |
+| - | - | - | - | - | - |
+| Différence maximale | 35803828 | 223427.8 | 19711.53 | 28328929 |
+| Part de la valeur maximale | 0.23 | 0.29 | 0.49 | 0.26 |
+
+Les différences présentes dans ce graphique sont donc significatives, et on peut constater que les musiques en Si, Fa♯/Sol♭ sont les musiques avec le plus gros succès en moyenne sur Youtube là où les musiques en Do♯/Ré♭ sont les musiques qui ont le plus gros succès en moyenne sur Spotify.
+
+La réponse à la question soulevée par le graphique précédent, à savoir *est-ce que les musiques en Ré♯/Mi♭ sont les moins présentes des plateformes de streaming à cause de leur manque de popularité*, n'est pas tout à fait claire.
+
+En effet, les musiques en La et Sol ont des performances moyennes inférieures mais sont plus nombreuses sur Youtube et Spotify.
+
+***
 ### Question 11 : Est-ce qu'une tonalité a un effet sur le type de chanson ? 
 Dans cette question, nous allons examiner les differentes caractéristiques des musiques pour chaque tonalité. Le but est de voir s'il existe une variation des différentes caractéristiques en fonction de la tonalité globale de la chanson.
 
