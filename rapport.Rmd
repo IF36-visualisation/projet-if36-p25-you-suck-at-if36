@@ -720,29 +720,92 @@ Dans le plan d'analyse initial, nous avons proposé de creer un barplot par tona
 
 Affichage du graphique 1
 ```{r message=FALSE, warning=FALSE}
-ggplot(graphe_11_a, aes(x = Key, y = Value, fill = Type)) +
-  geom_bar(stat = "identity", position = position_dodge()) + 
-  ggtitle("Graphique 1 : Les caractéristiques musicales en fonction de la tonalité") +
-  labs(y = "Score (entre 0 et 1)", x = "Tonalité", fill="Caracteristique")
+graphe_11_a <- graphe_11_a %>% filter(!is.na(Key))
+
+graphe_11_1 <- data.frame(
+  row.names = c("Do","Do / Ré","Ré","Ré / Mi","Mi","Fa","Fa / Sol","Sol","Sol / La","La","La / Si","Si","NaN"),
+  valence = avg_Valence[2], 
+  liveness = avg_Liveness[2], 
+  instrumentalness = avg_Instrumentalness[2],
+  acousticness = avg_Acousticness[2], 
+  speechiness = avg_Speechiness[2], 
+  energy = avg_Energy[2],
+  danceability = avg_danceability[2]
+)
+
+max_min <- data.frame(
+  valence = c(1, 0), liveness = c(1, 0), instrumentalness = c(1, 0),
+  acousticness = c(1, 0), speechiness = c(1, 0), energy = c(1, 0),
+  danceability = c(1,0)
+)
+rownames(max_min) <- c("Max", "Min")
+
+graphe_11_1 <- rbind(max_min, graphe_11_1)
+
+do_data <- graphe_11_1 [c("Max", "Min", "Do"), ]
+
+create_beautiful_radarchart <- function(data, color = "#00AFBB", 
+                                        vlabels = colnames(data), vlcex = 0.7,
+                                        caxislabels = NULL, title = NULL, ...){
+  radarchart(
+    data, axistype = 1,
+    # Customize the polygon
+    pcol = color, pfcol = scales::alpha(color, 0.5), plwd = 2, plty = 1,
+    # Customize the grid
+    cglcol = "grey", cglty = 1, cglwd = 0.8,
+    # Customize the axis
+    axislabcol = "grey", 
+    # Variable labels
+    vlcex = vlcex, vlabels = vlabels,
+    caxislabels = caxislabels, title = title, ...
+  )
+}
+
+# Définir les couleurs (13 couleurs différentes)
+colors <- c("#00AFBB", "#E7B800", "#FC4E07", "#7CAE00", "#C77CFF", 
+            "#00BFC4", "#F8766D", "#A3A500", "#FF61C3", "#619CFF",
+            "#FFB000", "#00C19F")
+
+# Titres des graphiques
+titles <- c("Do","Do / Ré","Ré","Ré / Mi","Mi","Fa","Fa / Sol","Sol","Sol / La","La","La / Si","Si")
+
+# Réduire les marges et définir une grille de 3 lignes × 5 colonnes
+# (ça affiche 15 emplacements, donc les 13 étudiants auront de la place)
+op <- par(mar = c(1, 1, 2, 1))
+par(mfrow = c(3, 5))
+
+# Créer les radars pour chaque étudiant
+for(i in 1:12){
+  create_beautiful_radarchart(
+    data = graphe_11_1[c(1, 2, i + 2), ],
+    caxislabels = c(0, 2.5, 5, 7.5, 10),
+    color = colors[i],
+    title = titles[i]
+  )
+}
+
+# Réinitialiser les paramètres graphiques
+par(op)
 ```
 
 
 Affichage du graphique 2
 ```{r message=FALSE, warning=FALSE}
-ggplot(graphe_11_b, aes(x = Key, y = tempo)) +
-  geom_bar(stat = "identity", position = position_dodge(), width = 0.2, fill="darkolivegreen4") + 
-  ggtitle("Graphique 2 : Le Tempo des musiques en fonction de la tonalité") +
-  labs(y = "Tempo (entre 0 et 125 BPM)", x = "Tonalité")
+ggplot(dataset, aes(x = factor(Key), y = Tempo, color=factor(Key))) + 
+  geom_violin(trim = FALSE) +
+  theme_minimal() +
+  labs(x = "Tonalité", y = "Tempo") +
+  ggtitle("Graphique 2 : Distribution du Tempo par Tonalité")
 ```
 
 
 Affichage du graphique 3
 ```{r message=FALSE, warning=FALSE}
-ggplot(graphe_11_c, aes(x = Key, y = loudness)) +
-  geom_bar(stat = "identity", position = position_dodge(), width = 0.2, fill="deeppink1") + 
-  scale_y_reverse() +
-  ggtitle("Graphique 3 : La Loudness des musiques en fonction de la tonalité") +
-  labs(y = "Loudness (entre 0 et -9 dB)", x = "Tonalité")
+ggplot(dataset, aes(x = factor(Key), y = Loudness, color=factor(Key))) + 
+  geom_violin(trim = FALSE) +
+  theme_minimal() +
+  labs(x = "Tonalité", y = "Loudness") +
+  ggtitle("Graphique 3 : Distribution du Loudness par Tonalité")
 ```
 
 **Observations diverses**
