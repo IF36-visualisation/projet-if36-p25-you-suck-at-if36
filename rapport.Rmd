@@ -75,6 +75,30 @@ dataset <- read_csv('data/Spotify_Youtube.csv');
 
 ## Analyse detaillée du dataset
 
+### Question 1 : Quelle est la repartition des types d'album dans le dataset ? 
+L'objectif est de visualiser la fréquence des chansons issues d'albums par rapport aux singles.
+
+
+**Hypothèses**
+
+**Traitement des données**
+
+Ici, nous allons voir si dans la colonne Album_type nous avons des doublons ou des fautes de frappe ("Single" ou "sInGle")
+```{r message=FALSE, warning=FALSE}
+unique(dataset$Album_type)
+```
+
+**Visualisation**
+
+Dans 
+
+Affichage du graphique 1
+```{r message=FALSE, warning=FALSE}
+ggplot(dataset, aes(y = Album_type, fill=Album_type)) +
+  geom_histogram(stat="count")
+```
+**Observations diverses**
+
 ### Question 2 : Y a-t-il une corrélation entre la “danceability” et le tempo ?
 
 **Hypothèse **
