@@ -7,6 +7,11 @@ output:
     theme: architect
     highlight: github
 ---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
 # IF36 \- Proposition
 
 ## Introduction
@@ -55,22 +60,24 @@ Le dataset utilisé est complet et ne devrait pas nécessiter de traitement de d
 
 ## Chargement des Librairies utilisées
 ```{r libraries, message=FALSE, warning=FALSE}
-library(ggplot2);
-library(scales);
-library(readr);
-library(dplyr);
-library(magrittr);
-library(tidyr);
-library(boot);
+library(ggplot2)
+library(scales)
+library(readr)
+library(dplyr)
+library(magrittr)
+library(tidyr)
+library(boot)
+library(forcats)
+library(fmsb)
 
 ## Define theme colors to use for graphs
-theme <- "#63a0e1";
-darktheme <- "#2e7bcf";
+theme <- "#63a0e1"
+darktheme <- "#2e7bcf"
 ```
 
 ## Chargement du dataset
 ```{r dataset, message=FALSE, warning=FALSE}
-dataset <- read_csv('data/Spotify_Youtube.csv');
+dataset <- read_csv("data/Spotify_Youtube.csv")
 ```
 
 ## Analyse detaillée du dataset
@@ -94,8 +101,8 @@ Dans
 
 Affichage du graphique 1
 ```{r message=FALSE, warning=FALSE}
-ggplot(dataset, aes(y = Album_type, fill=Album_type)) +
-  geom_histogram(stat="count")
+ggplot(dataset, aes(y = Album_type, fill = Album_type)) +
+  geom_histogram(stat = "count")
 ```
 **Observations diverses**
 
@@ -112,13 +119,13 @@ Nous allons également supprimer les valeurs anormales, c'est-à-dire les morcea
 
 
 ```{r message=FALSE, warning=FALSE}
-dataset %>% 
+dataset %>%
   filter((Tempo > 20 & Tempo < 250)) %>%
-  ggplot(aes(x=Tempo, y=Danceability)) + 
-  geom_hex(bins = 50) + 
+  ggplot(aes(x = Tempo, y = Danceability)) +
+  geom_hex(bins = 50) +
   scale_fill_viridis_c() +
-  geom_smooth(method="gam", se=FALSE, size = 1.5, color = "#FDE725") +
-  labs(title="Corrélation entre le tempo et la danceability", x="Tempo (BPM)", y="Danceability") + 
+  geom_smooth(method = "gam", se = FALSE, size = 1.5, color = "#FDE725") +
+  labs(title = "Corrélation entre le tempo et la danceability", x = "Tempo (BPM)", y = "Danceability") +
   theme_minimal() +
   theme(
     plot.title = element_text(hjust = 0.5, size = 18, face = "bold"),
@@ -126,7 +133,7 @@ dataset %>%
     axis.text = element_text(size = 12),
     panel.grid.major = element_line(color = "gray80"),
     panel.grid.minor = element_blank(),
-);
+  )
 ```
 
 **Observations **
@@ -134,17 +141,16 @@ dataset %>%
 D'après le graphique, on constate qu'il y a une légère corrélation entre le tempo et la *danceability*. En effet, plus le tempo est élevé, plus la *danceability* augmente, jusqu'à un certain point. Au-delà de 120 BPM, la *danceability* semble se stabiliser voir même diminuer. Cela peut s'expliquer par le fait que les morceaux très rapides peuvent devenir trop complexes pour être dansés facilement. Ou encore que l'ensemble des données est très concentré vers les 100 BPM, ce qui fausse la perception de la tendance.
 
 ```{r message=FALSE, warning=FALSE}
-# affichage de la repartition du tempo 
-dataset %>% ggplot(aes(x=Tempo)) + 
-  geom_histogram(binwidth=5, fill="steelblue", color="black", alpha=0.7) +
-  labs(title="Répartition du tempo", x="Tempo (BPM)", y="Nombre de morceaux") + 
+# affichage de la repartition du tempo
+dataset %>% ggplot(aes(x = Tempo)) +
+  geom_histogram(binwidth = 5, fill = "steelblue", color = "black", alpha = 0.7) +
+  labs(title = "Répartition du tempo", x = "Tempo (BPM)", y = "Nombre de morceaux") +
   theme_minimal() +
   theme(
-    plot.title = element_text(hjust=0.5, size=18, face="bold"),
-    axis.title = element_text(size=14),
-    axis.text = element_text(size=12)
-  );
-
+    plot.title = element_text(hjust = 0.5, size = 18, face = "bold"),
+    axis.title = element_text(size = 14),
+    axis.text = element_text(size = 12)
+  )
 ```
 
 En effet on remarque que la forme est similaire à une gaussienne, avec un maximum vers 100 BPM. Cela peut expliquer la tendance observée précédemment. Il n'y aurait donc pas ou très peu de corrélation entre le tempo et la *danceability*.
@@ -164,11 +170,11 @@ On filtre les valeurs de valence pour que la valence soit toujours comprise entr
 spotify_dataset <- dataset %>%
   filter(Valence >= 0 & Valence <= 1 & !is.na(Stream)) %>%
   select(Valence) %>%
-  na.omit();
+  na.omit()
 youtube_dataset <- dataset %>%
   filter(Valence >= 0 & Valence <= 1 & !is.na(Views)) %>%
   select(Valence) %>%
-  na.omit();
+  na.omit()
 ```
 
 **Visualisations :**
@@ -204,7 +210,9 @@ Les résultats de ces premiers graphiques montrent que les musiques présentes s
 **Déterminons le pourcentage de musiques plutôt joyeuses dans le dataset** 
 
 ```{r message=FALSE, warning=FALSE}
-dataset %>% filter(Valence > 0.5) %>% nrow() / dataset %>% nrow()
+dataset %>%
+  filter(Valence > 0.5) %>%
+  nrow() / dataset %>% nrow()
 ```
 
 Les musiques sont donc de manière générale plus joyeuses que tristes dans notre dataset.
@@ -212,7 +220,7 @@ Les musiques sont donc de manière générale plus joyeuses que tristes dans not
 **Déterminons la valence moyenne des musiques**
 
 ```{r message=FALSE, warning=FALSE}
-dataset$Valence %>% mean(na.rm = TRUE);
+dataset$Valence %>% mean(na.rm = TRUE)
 ```
 
 **Trouvons la répartition de la valence des musiques présentes uniquement sur l'une des deux platformes**
@@ -221,11 +229,11 @@ dataset$Valence %>% mean(na.rm = TRUE);
 spotify_only_dataset <- dataset %>%
   filter(Valence >= 0 & Valence <= 1 & is.na(Views)) %>%
   select(Valence) %>%
-  na.omit();
+  na.omit()
 youtube_only_dataset <- dataset %>%
   filter(Valence >= 0 & Valence <= 1 & is.na(Stream)) %>%
   select(Valence) %>%
-  na.omit();
+  na.omit()
 spotify_only_dataset %>% ggplot(aes(x = Valence)) +
   geom_histogram(aes(y = ..density..), bins = 30, fill = theme, color = "white", alpha = 0.7) +
   geom_density(color = darktheme, size = 1) +
@@ -249,8 +257,8 @@ youtube_only_dataset %>% ggplot(aes(x = Valence)) +
 Pour rappel, ces graphiques se basent sur peu de données, à savoir sur $469$ valeurs pour Spotify et $576$ valeurs pour Youtube.
 
 ```{r message=FALSE, warning=FALSE}
-nrow(spotify_only_dataset);
-nrow(youtube_only_dataset);
+nrow(spotify_only_dataset)
+nrow(youtube_only_dataset)
 ```
 
 Il apparait cependant que les musiques présentes uniquement sur Spotify ont tendance à avoir une valence répartie autour de $0,7$ : ce sont donc des musiques relativement joyeuses; là où les musiques présentes exclusivement sur Youtube ont une valence mieux répartie, incluant ainsi plus de musiques plus joyeuses et plus de musiques plus tristes que sur Spotify.
@@ -270,9 +278,10 @@ L'affichage des boxplots se fera suivant une échelle logarithmique, afin de mie
 
 ```{r message=FALSE, warning=FALSE}
 # Afficher le nombre de musiques live
-live_music <- dataset %>% filter(Liveness > 0.8) %>% select(contains("Stream"), contains("Views"));
+live_music <- dataset %>%
+  filter(Liveness > 0.8) %>%
+  select(contains("Stream"), contains("Views"))
 print(paste("Nombre de musiques live :", nrow(live_music)))
-
 ```
 
 Nous remarquons que le nombre de musique live n'est que de 385, soit environ 2% du dataset. Les résultats pourraient donc être biaisés par le faible nombre de musiques live.
@@ -288,7 +297,7 @@ live_dataset <- dataset %>%
 # Crée une fonction pour créer les boxplots
 plot_boxplot <- function(data, yvar, ylab, title, subtitle) {
   ggplot(data, aes_string(x = "is_live", y = yvar, fill = "is_live")) +
-    geom_boxplot(outlier.shape = NA,size = 0.7) +
+    geom_boxplot(outlier.shape = NA, size = 0.7) +
     scale_y_log10(labels = scales::comma) +
     labs(
       title = title,
@@ -302,21 +311,23 @@ plot_boxplot <- function(data, yvar, ylab, title, subtitle) {
       plot.subtitle = element_text(size = 13, hjust = 0.5),
       axis.title = element_text(size = 14),
       axis.text = element_text(size = 12),
-
     ) +
     guides(fill = "none")
 }
 
 # Appel de la fonction pour créer les boxplots
-plot_streams <- plot_boxplot(live_dataset, "Stream", "Nombre d'écoutes (log)", 
-                             "Comparaison des écoutes Spotify", "Entre chansons Live et Studio")
+plot_streams <- plot_boxplot(
+  live_dataset, "Stream", "Nombre d'écoutes (log)",
+  "Comparaison des écoutes Spotify", "Entre chansons Live et Studio"
+)
 
-plot_views <- plot_boxplot(live_dataset, "Views", "Nombre de vues (log)", 
-                          "Comparaison des vues YouTube", "Entre chansons Live et Studio")
+plot_views <- plot_boxplot(
+  live_dataset, "Views", "Nombre de vues (log)",
+  "Comparaison des vues YouTube", "Entre chansons Live et Studio"
+)
 
 plot_streams
 plot_views
-
 ```
 
 **Observations **
@@ -340,10 +351,9 @@ D'après une etude en 2019, fait par le media americain Quartz, la durée moyenn
 
 Avant de faire des visualisations, nous devons s'assurer qu'il n'y a pas de valeurs nulls dans la colonne Duration_ms. Apres cela, nous allons changer l'unité de durée, passant de ms en minutes, afin de mieux interpreter les valeurs.
 ```{r message=FALSE, warning=FALSE}
-dataset_question_5 <- dataset %>% 
+dataset_question_5 <- dataset %>%
   filter(!is.na(Duration_ms)) %>%
-  mutate(Duration_min = (Duration_ms / 1000)/60)
-
+  mutate(Duration_min = (Duration_ms / 1000) / 60)
 ```
 
 **Visualisation**
@@ -352,13 +362,13 @@ Le premier graphe est un boxplot, afin de voir le nombre des outliers presents d
 ```{r message=FALSE, warning=FALSE}
 mean_duration <- mean(dataset_question_5$Duration_min)
 
-ggplot(dataset_question_5, aes(x="", y = Duration_min)) +
+ggplot(dataset_question_5, aes(x = "", y = Duration_min)) +
   geom_boxplot() +
   ggtitle("Graphique 1 : Repartition de musiques en fonction de la durée") +
-  labs(y = "Durée (en minutes)") + 
-  theme(axis.text.x = element_blank()) + 
+  labs(y = "Durée (en minutes)") +
+  theme(axis.text.x = element_blank()) +
   geom_hline(yintercept = mean_duration, color = "red", linetype = "solid", size = 0.5) +
-  xlab("")+ 
+  xlab("") +
   stat_summary(
     aes(x = "", y = Duration_min, label = round(..y.., 1)),
     fun = mean,
@@ -374,17 +384,17 @@ Sur ce graphe, nous pouvons voir que la durée moyenne d'une chanson est de 3min
 dataset_question_5_plot2 <- dataset_question_5 %>% filter(Duration_min < 10)
 
 ggplot(data = dataset_question_5_plot2, aes(x = Duration_min)) +
-  geom_histogram(aes(y = ..density..),bins = 50, fill="#69b3a2", color="#e9ecef", alpha=0.9) + 
+  geom_histogram(aes(y = ..density..), bins = 50, fill = "#69b3a2", color = "#e9ecef", alpha = 0.9) +
   stat_function(
     fun = dnorm,
     args = list(mean = mean(dataset_question_5_plot2$Duration_min), sd = sd(dataset_question_5_plot2$Duration_min)),
     aes(color = "Densité theorique"),
     size = 1
   ) +
-  geom_vline(aes(xintercept=mean(Duration_min)), color="red", linetype="dashed", size=0.5) + 
+  geom_vline(aes(xintercept = mean(Duration_min)), color = "red", linetype = "dashed", size = 0.5) +
   scale_x_continuous(breaks = seq(0, 20, 1)) +
   ggtitle("Graphique 2 : Repartition de musiques en fonction de la durée") +
-  labs(x="Durée (en minutes)", y = "Fréquence") + 
+  labs(x = "Durée (en minutes)", y = "Fréquence") +
   scale_color_manual(
     name = "Légende",
     values = c("Densité theorique" = "red")
@@ -393,64 +403,66 @@ ggplot(data = dataset_question_5_plot2, aes(x = Duration_min)) +
 
 Maintenant qu'on a vu la repartition, il serait interessant de voir si les chansons d'une durée entre 3 à 4 minutes ont une tonalité differente de celle des outliers.
 ```{r message=FALSE, warning=FALSE}
-dataset_question5_plot3 <- dataset_question_5 %>% 
+dataset_question5_plot3 <- dataset_question_5 %>%
   filter(Duration_min <= 4) %>%
-  filter(Duration_min >= 3) %>% 
-  count(Key) %>% 
+  filter(Duration_min >= 3) %>%
+  count(Key) %>%
   arrange(n)
 
 dataset_question5_plot3$Key <- factor(dataset_question5_plot3$Key, levels = dataset_question5_plot3$Key)
 
 dataset_question5_plot3$Key <- fct_recode(dataset_question5_plot3$Key,
-                     "Do" = "0",
-                     "Do / Ré" = "1",
-                     "Ré"  = "2",
-                     "Ré / Mi" = "3",
-                     "Mi" = "4",
-                     "Fa" = "5",
-                     "Fa / Sol" = "6",
-                     "Sol" = "7",
-                     "Sol / La" = "8",
-                     "La" = "9",
-                     "La / Si" = "10",
-                     "Si" = "11")
+  "Do" = "0",
+  "Do / Ré" = "1",
+  "Ré" = "2",
+  "Ré / Mi" = "3",
+  "Mi" = "4",
+  "Fa" = "5",
+  "Fa / Sol" = "6",
+  "Sol" = "7",
+  "Sol / La" = "8",
+  "La" = "9",
+  "La / Si" = "10",
+  "Si" = "11"
+)
 
-ggplot(dataset_question5_plot3, aes(x=Key, y=n, fill=Key)) + 
+ggplot(dataset_question5_plot3, aes(x = Key, y = n, fill = Key)) +
   geom_bar(width = 0.9, stat = "identity") +
-  coord_polar(theta="y") + 
-  ylim(c(0,2000)) + 
+  coord_polar(theta = "y") +
+  ylim(c(0, 2000)) +
   ggtitle("Graphique 3 : Repartition de musiques d'une durée entre 3 à 4 minutes en fonction de la tonalité") +
-  labs(x="Tonalité", y = "Frequence", fill="Tonalité")
+  labs(x = "Tonalité", y = "Frequence", fill = "Tonalité")
 ```
 
 ```{r message=FALSE, warning=FALSE}
-dataset_question5_plot4 <- dataset_question_5 %>% 
+dataset_question5_plot4 <- dataset_question_5 %>%
   filter(Duration_min >= 10) %>%
-  count(Key) %>% 
+  count(Key) %>%
   arrange(n)
 
 dataset_question5_plot4$Key <- factor(dataset_question5_plot4$Key, levels = dataset_question5_plot4$Key)
 
 dataset_question5_plot4$Key <- fct_recode(dataset_question5_plot4$Key,
-                     "Do" = "0",
-                     "Do / Ré" = "1",
-                     "Ré"  = "2",
-                     "Ré / Mi" = "3",
-                     "Mi" = "4",
-                     "Fa" = "5",
-                     "Fa / Sol" = "6",
-                     "Sol" = "7",
-                     "Sol / La" = "8",
-                     "La" = "9",
-                     "La / Si" = "10",
-                     "Si" = "11")
+  "Do" = "0",
+  "Do / Ré" = "1",
+  "Ré" = "2",
+  "Ré / Mi" = "3",
+  "Mi" = "4",
+  "Fa" = "5",
+  "Fa / Sol" = "6",
+  "Sol" = "7",
+  "Sol / La" = "8",
+  "La" = "9",
+  "La / Si" = "10",
+  "Si" = "11"
+)
 
-ggplot(dataset_question5_plot4, aes(x=Key, y=n, fill=Key)) + 
+ggplot(dataset_question5_plot4, aes(x = Key, y = n, fill = Key)) +
   geom_bar(width = 0.9, stat = "identity") +
-  coord_polar(theta="y") + 
-  ylim(c(0,40)) + 
+  coord_polar(theta = "y") +
+  ylim(c(0, 40)) +
   ggtitle("Graphique 4 : Repartition de musiques d'une durée superieur de 20 minutes en fonction de la tonalité") +
-  labs(x="Tonalité", y = "Frequence", fill="Tonalité")
+  labs(x = "Tonalité", y = "Frequence", fill = "Tonalité")
 ```
 **Observations diverses**
 
@@ -474,18 +486,20 @@ Afin de calculer correctement la corrélation entre les différentes features et
 spotify_dataset <- dataset %>%
   filter(!is.na(Stream)) %>% # On retire les musiques qui n'ont pas de nombre de streams
   select(where(is.numeric), -...1, -Likes, -Views, -Comments) %>% # On retire les colonnes inutiles
-  na.omit(); # On retire la ligne si elle contient des valeurs non numériques
+  na.omit()
+# On retire la ligne si elle contient des valeurs non numériques
 spotify_dataset %>%
   nrow() %>%
-  print(); # On affiche le nombre de musiques présentes sur Spotify
+  print()
+# On affiche le nombre de musiques présentes sur Spotify
 # Faisons la même chose pour Youtube
 youtube_dataset <- dataset %>%
   filter(!is.na(Views)) %>%
   select(where(is.numeric), -...1, -Stream) %>%
-  na.omit();
+  na.omit()
 youtube_dataset %>%
   nrow() %>%
-  print();
+  print()
 ```
 
 On va donc visualiser les données de $20140$ musiques pour Spotify et $20099$ musiques pour Youtube.
@@ -494,21 +508,22 @@ On va donc visualiser les données de $20140$ musiques pour Spotify et $20099$ m
 Faisons d'abord une heatmap pour montrer la corrélation entre les différentes features et la performance des musiques sur Spotify :
 ```{r message=FALSE, warning=FALSE}
 correlation <- spotify_dataset %>%
-  cor(method="pearson") %>% # Dressons une matrice de corrélation en utilisant les valeurs
+  cor(method = "pearson") %>% # Dressons une matrice de corrélation en utilisant les valeurs
   as.table() %>% # On transforme la matrice en un tableau contenant la ligne, la colonne et la valeur
   as.data.frame() %>% # On recupère le tableau dans un dataframe
-  mutate(value=abs(Freq)); # On ne conserve que la valeur absolue de la corrélation
+  mutate(value = abs(Freq))
+# On ne conserve que la valeur absolue de la corrélation
 correlation %>%
-  ggplot(aes(x=Var1, y=Var2, fill=value)) +
+  ggplot(aes(x = Var1, y = Var2, fill = value)) +
   geom_tile() +
-  scale_fill_viridis_c(option="inferno") +
+  scale_fill_viridis_c(option = "inferno") +
   theme(
-    axis.title=element_blank(),
+    axis.title = element_blank(),
     axis.text.x = element_text(angle = 90, vjust = 0.4, hjust = 0.9),
-    plot.title = element_text(size=12)
+    plot.title = element_text(size = 12)
   ) +
   ggtitle("Corrélation entre les différentes features et les performances sur Spotify") +
-  labs(fill="Indice de\ncorrélation");
+  labs(fill = "Indice de\ncorrélation")
 ```
 
 On constate déjà que la performance sur Spotify *(Stream)* est très peu corrélée avec les différentes features des musiques. On voit que la corrélation la plus élevée reste très faible (~15%) et concerne l'intensité sonore, l'acoustique et l'instrumentalité.
@@ -519,14 +534,14 @@ Afin d'y voir plus clair, nous allons réaliser un *BarPlot* des features pour a
 columns <- c("Stream", "Views", "Likes", "Comments")
 correlation %>%
   filter(Var1 %in% columns & !Var2 %in% columns) %>%
-  ggplot(aes(x=Var2, y=value, fill=Var1)) +
-  geom_bar(position="dodge", stat="identity") +
+  ggplot(aes(x = Var2, y = value, fill = Var1)) +
+  geom_bar(position = "dodge", stat = "identity") +
   theme(
     axis.text.x = element_text(angle = 90, vjust = 0.4, hjust = 0.9),
-    plot.title = element_text(size=12)
+    plot.title = element_text(size = 12)
   ) +
-  labs(x="Feature", y="Corrélation", fill="Performance") +
-  ggtitle("Importance des features dans la performance de la musique sur Spotify");
+  labs(x = "Feature", y = "Corrélation", fill = "Performance") +
+  ggtitle("Importance des features dans la performance de la musique sur Spotify")
 ```
 
 On peut désormais classer plus facilement les différentes features en ordre d'importance : *Loudness* puis *Acousticness* puis *Instrumentalness*. \
@@ -536,21 +551,21 @@ Regardons maintenant ce qu'il en est sur Youtube. On souhaite regarder ici la co
 
 ```{r message=FALSE, warning=FALSE}
 correlation <- youtube_dataset %>%
-  cor(method="pearson") %>%
+  cor(method = "pearson") %>%
   as.table() %>%
   as.data.frame() %>%
-  mutate(value=abs(Freq));
+  mutate(value = abs(Freq))
 correlation %>%
-  ggplot(aes(x=Var1, y=Var2, fill=value)) +
+  ggplot(aes(x = Var1, y = Var2, fill = value)) +
   geom_tile() +
-  scale_fill_viridis_c(option="inferno") +
+  scale_fill_viridis_c(option = "inferno") +
   theme(
-    axis.title=element_blank(),
+    axis.title = element_blank(),
     axis.text.x = element_text(angle = 90, vjust = 0.4, hjust = 0.9),
-    plot.title = element_text(size=12)
+    plot.title = element_text(size = 12)
   ) +
   ggtitle("Corrélation entre les différentes features et les performances sur Youtube") +
-  labs(fill="Indice de\ncorrélation");
+  labs(fill = "Indice de\ncorrélation")
 ```
 
 On remarque deux choses :
@@ -564,14 +579,14 @@ De la même façon que précédemment, on affiche la corrélation entre les diff
 columns <- c("Stream", "Views", "Likes", "Comments")
 correlation %>%
   filter(Var1 %in% columns & !Var2 %in% columns) %>%
-  ggplot(aes(x=Var2, y=value, fill=Var1)) +
-  geom_bar(position="dodge", stat="identity") +
+  ggplot(aes(x = Var2, y = value, fill = Var1)) +
+  geom_bar(position = "dodge", stat = "identity") +
   theme(
     axis.text.x = element_text(angle = 90, vjust = 0.4, hjust = 0.9),
-    plot.title = element_text(size=12)
+    plot.title = element_text(size = 12)
   ) +
-  labs(x="Feature", y="Corrélation", fill="Performance") +
-  ggtitle("Importance des features dans la performance de la musique sur Youtube");
+  labs(x = "Feature", y = "Corrélation", fill = "Performance") +
+  ggtitle("Importance des features dans la performance de la musique sur Youtube")
 ```
 
 Le côté dansant de la musique arrive en $2^e$ position, et semble donc plus important que sur Spotify. Cela dit, cela reste à nuancer puisque la corrélation reste très faible. Ainsi, comme sur Spotify, nous n'avons pas encore trouvé la recette du succès sur Youtube.
@@ -595,7 +610,9 @@ Certaines tonalités sont peut être plus présentes que d'autres dans le datase
 Afin de pouvoir utiliser les données correctement et d'afficher les résultats de manière lisible, on va transformer les codes des différentes tonalités en leur valeur (ex. 0 = Do). Par la même occasion, on crée une catégorie pour les musiques dont la tonalité n'a pas pu être déterminée. On retire également les colonnes inutiles.
 
 ```{r message=FALSE, warning=FALSE}
-keys <- dataset %>% select(Key, Views, Stream, Likes, Comments) %>% mutate(Key=replace_na(Key, 12));
+keys <- dataset %>%
+  select(Key, Views, Stream, Likes, Comments) %>%
+  mutate(Key = replace_na(Key, 12))
 note_labels <- c(
   "Do",
   "Do♯/Ré♭",
@@ -610,9 +627,9 @@ note_labels <- c(
   "La♯/Si♭",
   "Si",
   "Tonalité inconnue"
-);
-keys$Key <- factor(keys$Key, levels = 0:12, labels = note_labels);
-keys_only <- keys %>% select(Key);
+)
+keys$Key <- factor(keys$Key, levels = 0:12, labels = note_labels)
+keys_only <- keys %>% select(Key)
 ```
 
 **Visualisations**
@@ -621,7 +638,7 @@ Nous allons compter le nombre de musiques pour chaque tonalité, et afficher les
 
 ```{r message=FALSE, warning=FALSE}
 keys_only %>% ggplot(aes(x = Key)) +
-  geom_bar(fill = theme, color = 'white', width=1) +
+  geom_bar(fill = theme, color = "white", width = 1) +
   labs(
     title = "Distribution des tonalités",
     x = "Tonalité",
@@ -629,32 +646,39 @@ keys_only %>% ggplot(aes(x = Key)) +
   ) +
   theme(
     axis.text.x = element_text(angle = 90, vjust = 0.4, hjust = 0.9),
-    plot.title = element_text(size=12)
-  );
+    plot.title = element_text(size = 12)
+  )
 ```
 
-On constate que certaines tonalités sont légèrement plus présentes que les autres sur les plateformes Youtube et Spotify, comme le Do, Sol, Do♯/Ré♭, Ré et La.
+On constate que certaines tonalités sont légèrement plus présentes que les autres sur les plateformes Youtube and Spotify, comme le Do, Sol, Do♯/Ré♭, Ré et La.
 
 On remarque également qu'il y a nettement moins de musiques avec la tonalité Ré♯/Mi♭. On va tenter de voir s'il existe des corrélations entre le succès d'une musique et sa tonalité, ce qui pourrait expliquer le faible nombre de musiques en Ré♯/Mi♭.
 
 ```{r message=FALSE, warning=FALSE, fig.height=3}
-keys %>% filter(Key != note_labels[13]) %>% group_by(Key) %>% summarise(
-  Streams=mean(Stream, na.rm=TRUE), Likes=mean(Likes, na.rm=TRUE),
-  Comments=mean(Comments, na.rm=TRUE), Views=mean(Views, na.rm=TRUE)
-) %>% mutate(across(where(is.numeric),
-  ~ (. - min(., na.rm = TRUE)) / (max(., na.rm = TRUE) - min(., na.rm = TRUE)))
-) %>% pivot_longer(
-  cols=c(Streams, Likes, Comments, Views), names_to="Stat", values_to="Value"
-) %>% ggplot(aes(x=Key, y=Stat, fill=Value)) +
+keys %>%
+  filter(Key != note_labels[13]) %>%
+  group_by(Key) %>%
+  summarise(
+    Streams = mean(Stream, na.rm = TRUE), Likes = mean(Likes, na.rm = TRUE),
+    Comments = mean(Comments, na.rm = TRUE), Views = mean(Views, na.rm = TRUE)
+  ) %>%
+  mutate(across(
+    where(is.numeric),
+    ~ (. - min(., na.rm = TRUE)) / (max(., na.rm = TRUE) - min(., na.rm = TRUE))
+  )) %>%
+  pivot_longer(
+    cols = c(Streams, Likes, Comments, Views), names_to = "Stat", values_to = "Value"
+  ) %>%
+  ggplot(aes(x = Key, y = Stat, fill = Value)) +
   geom_tile() +
-  scale_fill_viridis_c(option="inferno") +
+  scale_fill_viridis_c(option = "inferno") +
   theme(
-    axis.title=element_blank(),
+    axis.title = element_blank(),
     axis.text.x = element_text(angle = 90, vjust = 0.4, hjust = 0.9),
-    plot.title = element_text(size=12)
+    plot.title = element_text(size = 12)
   ) +
   ggtitle("Succès moyen de la musique selon la tonalité") +
-  labs(fill="Succès\n(normalisé)");
+  labs(fill = "Succès\n(normalisé)")
 ```
 
 Afin de mieux comprendre l'échelle utilisée dans ce graphique, on a calculé la différence entre la valeur la plus foncée et la valeur la plus claire :
@@ -728,13 +752,15 @@ graphe_11_a <- data.frame(
   avg_Acousticness[2], avg_Speechiness[2], avg_Energy[2], avg_danceability[2]
 )
 graphe_11_a <- graphe_11_a |>
-  pivot_longer(cols = liveness:danceability,
-               names_to = "Type",
-               values_to = "Value")
+  pivot_longer(
+    cols = liveness:danceability,
+    names_to = "Type",
+    values_to = "Value"
+  )
 
-graphe_11_b <- data.frame(avg_Tempo[1],avg_Tempo[2])
+graphe_11_b <- data.frame(avg_Tempo[1], avg_Tempo[2])
 
-graphe_11_c <- data.frame(avg_Tempo[1],avg_Loudness[2])
+graphe_11_c <- data.frame(avg_Tempo[1], avg_Loudness[2])
 ```
 
 **Visualisation**
@@ -747,12 +773,12 @@ Affichage du graphique 1
 graphe_11_a <- graphe_11_a %>% filter(!is.na(Key))
 
 graphe_11_1 <- data.frame(
-  row.names = c("Do","Do / Ré","Ré","Ré / Mi","Mi","Fa","Fa / Sol","Sol","Sol / La","La","La / Si","Si","NaN"),
-  valence = avg_Valence[2], 
-  liveness = avg_Liveness[2], 
+  row.names = c("Do", "Do / Ré", "Ré", "Ré / Mi", "Mi", "Fa", "Fa / Sol", "Sol", "Sol / La", "La", "La / Si", "Si", "NaN"),
+  valence = avg_Valence[2],
+  liveness = avg_Liveness[2],
   instrumentalness = avg_Instrumentalness[2],
-  acousticness = avg_Acousticness[2], 
-  speechiness = avg_Speechiness[2], 
+  acousticness = avg_Acousticness[2],
+  speechiness = avg_Speechiness[2],
   energy = avg_Energy[2],
   danceability = avg_danceability[2]
 )
@@ -760,25 +786,26 @@ graphe_11_1 <- data.frame(
 max_min <- data.frame(
   valence = c(1, 0), liveness = c(1, 0), instrumentalness = c(1, 0),
   acousticness = c(1, 0), speechiness = c(1, 0), energy = c(1, 0),
-  danceability = c(1,0)
+  danceability = c(1, 0)
 )
 rownames(max_min) <- c("Max", "Min")
 
 graphe_11_1 <- rbind(max_min, graphe_11_1)
 
-do_data <- graphe_11_1 [c("Max", "Min", "Do"), ]
+do_data <- graphe_11_1[c("Max", "Min", "Do"), ]
 
-create_beautiful_radarchart <- function(data, color = "#00AFBB", 
+create_beautiful_radarchart <- function(data, color = "#00AFBB",
                                         vlabels = colnames(data), vlcex = 0.7,
-                                        caxislabels = NULL, title = NULL, ...){
+                                        caxislabels = NULL, title = NULL, ...) {
   radarchart(
-    data, axistype = 1,
+    data,
+    axistype = 1,
     # Customize the polygon
     pcol = color, pfcol = scales::alpha(color, 0.5), plwd = 2, plty = 1,
     # Customize the grid
     cglcol = "grey", cglty = 1, cglwd = 0.8,
     # Customize the axis
-    axislabcol = "grey", 
+    axislabcol = "grey",
     # Variable labels
     vlcex = vlcex, vlabels = vlabels,
     caxislabels = caxislabels, title = title, ...
@@ -786,12 +813,14 @@ create_beautiful_radarchart <- function(data, color = "#00AFBB",
 }
 
 # Définir les couleurs (13 couleurs différentes)
-colors <- c("#00AFBB", "#E7B800", "#FC4E07", "#7CAE00", "#C77CFF", 
-            "#00BFC4", "#F8766D", "#A3A500", "#FF61C3", "#619CFF",
-            "#FFB000", "#00C19F")
+colors <- c(
+  "#00AFBB", "#E7B800", "#FC4E07", "#7CAE00", "#C77CFF",
+  "#00BFC4", "#F8766D", "#A3A500", "#FF61C3", "#619CFF",
+  "#FFB000", "#00C19F"
+)
 
 # Titres des graphiques
-titles <- c("Do","Do / Ré","Ré","Ré / Mi","Mi","Fa","Fa / Sol","Sol","Sol / La","La","La / Si","Si")
+titles <- c("Do", "Do / Ré", "Ré", "Ré / Mi", "Mi", "Fa", "Fa / Sol", "Sol", "Sol / La", "La", "La / Si", "Si")
 
 # Réduire les marges et définir une grille de 3 lignes × 5 colonnes
 # (ça affiche 15 emplacements, donc les 13 étudiants auront de la place)
@@ -799,7 +828,7 @@ op <- par(mar = c(1, 1, 2, 1))
 par(mfrow = c(3, 5))
 
 # Créer les radars pour chaque étudiant
-for(i in 1:12){
+for (i in 1:12) {
   create_beautiful_radarchart(
     data = graphe_11_1[c(1, 2, i + 2), ],
     caxislabels = c(0, 2.5, 5, 7.5, 10),
@@ -815,7 +844,7 @@ par(op)
 
 Affichage du graphique 2
 ```{r message=FALSE, warning=FALSE}
-ggplot(dataset, aes(x = factor(Key), y = Tempo, color=factor(Key))) + 
+ggplot(dataset, aes(x = factor(Key), y = Tempo, color = factor(Key))) +
   geom_violin(trim = FALSE) +
   theme_minimal() +
   labs(x = "Tonalité", y = "Tempo") +
@@ -825,7 +854,7 @@ ggplot(dataset, aes(x = factor(Key), y = Tempo, color=factor(Key))) +
 
 Affichage du graphique 3
 ```{r message=FALSE, warning=FALSE}
-ggplot(dataset, aes(x = factor(Key), y = Loudness, color=factor(Key))) + 
+ggplot(dataset, aes(x = factor(Key), y = Loudness, color = factor(Key))) +
   geom_violin(trim = FALSE) +
   theme_minimal() +
   labs(x = "Tonalité", y = "Loudness") +
@@ -857,7 +886,7 @@ On constate aussi que certains individus n'ont pas d'url Youtube, ce qui pourrai
 # nb total de musiques
 total_musiques <- nrow(dataset)
 # nb d'individus sans vidéos youtube
-total_sans_ytb <- nrow(dataset[dataset$Url_youtube == '',])
+total_sans_ytb <- nrow(dataset[dataset$Url_youtube == "", ])
 # % d'individus sans vidéos youtube
 pourcentage_sans_ytb <- (total_sans_ytb / total_musiques) * 100
 
@@ -868,7 +897,7 @@ cat("Pourcentage de musiques sans vidéos YouTube :", round(pourcentage_sans_ytb
 Étant donné que seulement $2,27%$ des musiques ne disposent pas de données YouTube, nous avons décidé de les supprimer sans risque d'altérer l'analyse globale.
 ```{r message=FALSE, warning=FALSE}
 # Suppression des musiques sans URL YouTube
-dataset <- dataset[dataset$Url_youtube != '',]
+dataset <- dataset[dataset$Url_youtube != "", ]
 total_musiques <- nrow(dataset)
 cat("Nombre total de musiques après suppression :", total_musiques, "\n")
 ```
@@ -885,19 +914,21 @@ top_views <- dataset %>%
 
 # Graphique
 ggplot(top_views, aes(
-  x = Total_Views/1e6,
+  x = Total_Views / 1e6,
   y = reorder(paste(Rank_Youtube, Artist, sep = " - "), Total_Views)
 )) +
   geom_point(size = 3) +
-  geom_text(aes(label = round(Total_Views/1e6,1)), hjust = -0.5, size = 2.5) +
-  labs(title = "Top 50 artistes - Vues YouTube",
-       x = "Nombre de vues (en millions)",
-       y = "Artiste") +
+  geom_text(aes(label = round(Total_Views / 1e6, 1)), hjust = -0.5, size = 2.5) +
+  labs(
+    title = "Top 50 artistes - Vues YouTube",
+    x = "Nombre de vues (en millions)",
+    y = "Artiste"
+  ) +
   scale_x_continuous(labels = comma, expand = expansion(mult = c(0, 0.15))) +
   theme_minimal() +
   theme(
-    plot.margin = margin(10, 40, 10, 10),  # marges plus larges à droite
-    axis.text.y = element_text(size = 6)    # textes des artistes plus petits pour aérer
+    plot.margin = margin(10, 40, 10, 10), # marges plus larges à droite
+    axis.text.y = element_text(size = 6) # textes des artistes plus petits pour aérer
   )
 ```
 
@@ -912,19 +943,21 @@ top_streams <- dataset %>%
 
 # Graphique
 ggplot(top_streams, aes(
-  x = Total_Streams/1e6,
+  x = Total_Streams / 1e6,
   y = reorder(paste(Rank_Spotify, Artist, sep = " - "), Total_Streams)
 )) +
   geom_point(size = 3) +
-  geom_text(aes(label = round(Total_Streams/1e6,1)), hjust = -0.5, size = 2.5) +
-  labs(title = "Top 50 artistes - Écoutes Spotify",
-       x = "Nombre d'écoutes (en millions)",
-       y = "Artiste") +
+  geom_text(aes(label = round(Total_Streams / 1e6, 1)), hjust = -0.5, size = 2.5) +
+  labs(
+    title = "Top 50 artistes - Écoutes Spotify",
+    x = "Nombre d'écoutes (en millions)",
+    y = "Artiste"
+  ) +
   scale_x_continuous(labels = comma, expand = expansion(mult = c(0, 0.15))) +
   theme_minimal() +
   theme(
-    plot.margin = margin(10, 40, 10, 10),  # marges plus larges à droite
-    axis.text.y = element_text(size = 6)    # textes des artistes plus petits pour aérer
+    plot.margin = margin(10, 40, 10, 10), # marges plus larges à droite
+    axis.text.y = element_text(size = 6) # textes des artistes plus petits pour aérer
   )
 ```
 On constate que certains artistes affichent des disparités entre vues et streams. Par exemple, Post Malone est premier en nombre de streams Spotify mais se classe seulement $37^e$ en vues YouTube, tandis que CoComelon est deuxième en vues YouTube sans apparaître dans le top Spotify.
@@ -933,8 +966,10 @@ Cela confirme l'idée que la plateforme impacte la visibilité et la consommatio
 # Top 50 artistes combiné (Vues + Streams)
 top_combined <- dataset %>%
   group_by(Artist) %>%
-  summarise(Total_Views = sum(Views, na.rm = TRUE),
-            Total_Streams = sum(Stream, na.rm = TRUE)) %>%
+  summarise(
+    Total_Views = sum(Views, na.rm = TRUE),
+    Total_Streams = sum(Stream, na.rm = TRUE)
+  ) %>%
   mutate(Score = Total_Views + Total_Streams) %>%
   arrange(desc(Score)) %>%
   slice_head(n = 50) %>%
@@ -942,19 +977,21 @@ top_combined <- dataset %>%
 
 # Graphique
 ggplot(top_combined, aes(
-  x = Score/1e6,
+  x = Score / 1e6,
   y = reorder(paste(Rank_Combined, Artist, sep = " - "), Score)
 )) +
   geom_point(size = 3) +
-  geom_text(aes(label = round(Score/1e6,1)), hjust = -0.5, size = 2.5) +
-  labs(title = "Top 50 artistes - Score combiné (Vues + Écoutes)",
-       x = "Score combiné (en millions)",
-       y = "Artiste") +
+  geom_text(aes(label = round(Score / 1e6, 1)), hjust = -0.5, size = 2.5) +
+  labs(
+    title = "Top 50 artistes - Score combiné (Vues + Écoutes)",
+    x = "Score combiné (en millions)",
+    y = "Artiste"
+  ) +
   scale_x_continuous(labels = comma, expand = expansion(mult = c(0, 0.15))) +
   theme_minimal() +
   theme(
-    plot.margin = margin(10, 40, 10, 10),  # marges plus larges à droite
-    axis.text.y = element_text(size = 6)    # textes des artistes plus petits pour aérer
+    plot.margin = margin(10, 40, 10, 10), # marges plus larges à droite
+    axis.text.y = element_text(size = 6) # textes des artistes plus petits pour aérer
   )
 ```
 On obtient une vision plus complète de la popularité des artistes.
@@ -1001,7 +1038,7 @@ spotify_only_dataset <- dataset %>%
   filter(Artist %in% spotify_only) %>%
   group_by(Artist) %>%
   summarise(Total_Views = sum(Views, na.rm = TRUE)) %>%
-  arrange(desc(Total_Views)) 
+  arrange(desc(Total_Views))
 
 # Données pour YouTube only
 youtube_only_dataset <- dataset %>%
@@ -1011,12 +1048,14 @@ youtube_only_dataset <- dataset %>%
   arrange(desc(Total_Streams))
 
 # Premier graphique : Spotify only (vues YouTube)
-ggplot(spotify_only_dataset, aes(Total_Views/1e6, reorder(Artist, Total_Views))) +
+ggplot(spotify_only_dataset, aes(Total_Views / 1e6, reorder(Artist, Total_Views))) +
   geom_point(size = 3, color = "steelblue") +
-  geom_text(aes(label = round(Total_Views/1e6, 1)), hjust = -0.5, size = 2.5) +
-  labs(title = "Artistes Top 50 Spotify (hors Top 50 YouTube)",
-       x = "Nombre de vues YouTube (en millions)",
-       y = "Artiste") +
+  geom_text(aes(label = round(Total_Views / 1e6, 1)), hjust = -0.5, size = 2.5) +
+  labs(
+    title = "Artistes Top 50 Spotify (hors Top 50 YouTube)",
+    x = "Nombre de vues YouTube (en millions)",
+    y = "Artiste"
+  ) +
   scale_x_continuous(labels = comma, expand = expansion(mult = c(0, 0.15))) +
   theme_minimal() +
   theme(
@@ -1025,20 +1064,156 @@ ggplot(spotify_only_dataset, aes(Total_Views/1e6, reorder(Artist, Total_Views)))
   )
 
 # Deuxième graphique : YouTube only (streams Spotify)
-ggplot(youtube_only_dataset, aes(Total_Streams/1e6, reorder(Artist, Total_Streams))) +
+ggplot(youtube_only_dataset, aes(Total_Streams / 1e6, reorder(Artist, Total_Streams))) +
   geom_point(size = 3, color = "darkorange") +
-  geom_text(aes(label = round(Total_Streams/1e6, 1)), hjust = -0.5, size = 2.5) +
-  labs(title = "Artistes Top 50 YouTube (hors Top 50 Spotify)",
-       x = "Nombre d'écoutes Spotify (en millions)",
-       y = "Artiste") +
+  geom_text(aes(label = round(Total_Streams / 1e6, 1)), hjust = -0.5, size = 2.5) +
+  labs(
+    title = "Artistes Top 50 YouTube (hors Top 50 Spotify)",
+    x = "Nombre d'écoutes Spotify (en millions)",
+    y = "Artiste"
+  ) +
   scale_x_continuous(labels = comma, expand = expansion(mult = c(0, 0.15))) +
   theme_minimal() +
   theme(
     axis.text.y = element_text(size = 6),
     plot.margin = margin(10, 40, 10, 10)
   )
-
 ```
 On voit en bas de chaque classement les artistes qui ont de grosses disparités d'interaction entre les plateformes.
 Parmi les artistes du top stream, on voit qu'Olivia Rodrigo ou Doja Cat ont beaucoup moins d'interactions sur YouTube.
 Au contraire, on voit que des artistes ayant un fort succès sur YouTube comme CoComelon ou PSY ont des performances bien moindres sur Spotify.
+
+### Question 14 : Peut-on visualiser des clusters de chansons selon leurs caractéristiques avec la t-SNE ?
+
+...
+
+**Hypothèse :**
+...
+
+**Traitement des données :**
+...
+```{r tsne_streams, message=FALSE, warning=FALSE, echo=FALSE}
+library(Rtsne)
+library(plotly)
+library(dplyr)
+
+# Sélection des features numériques pertinentes
+tsne_data <- dataset %>%
+  select(Duration_ms, Tempo, Valence, Liveness, Instrumentalness, Acousticness, Speechiness, Loudness, Key, Energy, Danceability, Stream) %>%
+  na.omit()
+
+# Retirer les doublons sur les colonnes utilisées pour le t-SNE (sans Stream)
+tsne_data_nostream <- tsne_data %>%
+  select(-Stream) %>%
+  distinct()
+# On garde l’index pour retrouver les infos plus tard
+tsne_data <- tsne_data[as.numeric(rownames(tsne_data_nostream)), ]
+
+set.seed(42)
+if (nrow(tsne_data_nostream) > 2000) {
+  idx <- sample(nrow(tsne_data_nostream), 2000)
+  tsne_data_nostream <- tsne_data_nostream[idx, ]
+  tsne_data <- tsne_data[idx, ]
+}
+
+# t-SNE en 2D
+tsne_result <- Rtsne(as.matrix(tsne_data_nostream), dims = 2, perplexity = 30, verbose = TRUE, max_iter = 500)
+tsne_df <- as.data.frame(tsne_result$Y)
+colnames(tsne_df) <- c("Dim1", "Dim2")
+
+# Ajout des infos pour le survol et la couleur
+tsne_df$Title <- dataset$Track[as.numeric(rownames(tsne_data))]
+tsne_df$Artist <- dataset$Artist[as.numeric(rownames(tsne_data))]
+tsne_df$Stream <- tsne_data$Stream
+
+# Tooltip personnalisé
+tsne_df$hover <- paste0(
+  "<b>", tsne_df$Title, "</b><br>",
+  "Artiste : ", tsne_df$Artist, "<br>",
+  "Streams Spotify : ", format(tsne_df$Stream, big.mark = " ")
+)
+```
+**Visualisations :**
+
+```{r tsne, echo=FALSE}
+plot_ly(
+  tsne_df,
+  x = ~Dim1, y = ~Dim2,
+  color = ~Stream, colors = "viridis", # other colors can be
+  type = "scatter", mode = "markers",
+  marker = list(size = 6, opacity = 0.7),
+  text = ~hover,
+  hoverinfo = "text"
+) %>%
+  layout(title = "Projection t-SNE 2D des chansons (couleur = nombre de streams Spotify)")
+```
+
+```{r pca, echo=FALSE}
+# PCA
+pca_result <- prcomp(tsne_data_nostream, scale. = TRUE)
+pca_df <- as.data.frame(pca_result$x[, 1:2])
+colnames(pca_df) <- c("PC1", "PC2")
+
+# Ajout des infos pour le survol et la couleur
+pca_df$Title <- dataset$Track[as.numeric(rownames(tsne_data))]
+pca_df$Artist <- dataset$Artist[as.numeric(rownames(tsne_data))]
+pca_df$Stream <- tsne_data$Stream
+
+# Tooltip personnalisé
+pca_df$hover <- paste0(
+  "<b>", pca_df$Title, "</b><br>",
+  "Artiste : ", pca_df$Artist, "<br>",
+  "Streams Spotify : ", format(pca_df$Stream, big.mark = " ")
+)
+
+# Visualisation
+plot_ly(
+  pca_df,
+  x = ~PC1, y = ~PC2,
+  color = ~Stream, colors = "viridis",
+  type = "scatter", mode = "markers",
+  marker = list(size = 6, opacity = 0.7),
+  text = ~hover,
+  hoverinfo = "text"
+) %>%
+  layout(title = "Projection PCA 2D des chansons (couleur = nombre de streams Spotify)")
+```
+
+```{r umap, echo=FALSE}
+library(umap)
+
+# Configuration UMAP
+umap_config <- umap.defaults
+umap_config$n_neighbors <- 15
+umap_config$min_dist <- 0.1
+umap_config$random_state <- 42
+
+# UMAP sur les données numériques
+umap_result <- umap(as.matrix(tsne_data_nostream), config = umap_config)
+umap_df <- as.data.frame(umap_result$layout)
+colnames(umap_df) <- c("UMAP1", "UMAP2")
+
+# Ajout des infos
+umap_df$Title <- dataset$Track[as.numeric(rownames(tsne_data))]
+umap_df$Artist <- dataset$Artist[as.numeric(rownames(tsne_data))]
+umap_df$Stream <- tsne_data$Stream
+
+# Tooltip personnalisé
+umap_df$hover <- paste0(
+  "<b>", umap_df$Title, "</b><br>",
+  "Artiste : ", umap_df$Artist, "<br>",
+  "Streams Spotify : ", format(umap_df$Stream, big.mark = " ")
+)
+
+# Visualisation avec plotly
+plot_ly(
+  umap_df,
+  x = ~UMAP1, y = ~UMAP2,
+  color = ~Stream, colors = "viridis",
+  type = "scatter", mode = "markers",
+  marker = list(size = 6, opacity = 0.7),
+  text = ~hover,
+  hoverinfo = "text"
+) %>%
+  layout(title = "Projection UMAP 2D des chansons (couleur = nombre de streams Spotify)")
+```
