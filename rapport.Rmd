@@ -695,6 +695,43 @@ La réponse à la question soulevée par le graphique précédent, à savoir *es
 En effet, les musiques en La et Sol ont des performances moyennes inférieures mais sont plus nombreuses sur Youtube et Spotify.
 
 ***
+### Question 10 : Quelle est la relation entre la présence d’un contenu sous licence et le nombre de vues ?
+
+**Hypothèse **
+
+On peut supposer que les musiques sous licence ont plus de vues que les musiques sans licence. En effet, les musiques sous licence sont souvent des musiques populaires, qui ont été diffusées à la radio ou à la télévision, et qui ont donc plus de chances d'être vues par un plus grand nombre de personnes.
+
+**Traitement **
+
+Nous allons créer un graphique qui compare le nombre de vues des musiques sous licence et des musiques sans licence. Pour cela, nous allons utiliser un boxplot.
+
+```{r message=FALSE, warning=FALSE}
+plot_boxplot(
+  dataset, "Views", "Nombre de vues (log)", "Comparaison des vues des musiques sous licence et sans licence",
+  "Entre chansons sous licence et sans licence"
+)
+```
+
+**Observations **
+
+D'après le graphique, on constate qu'il y a une légère corrélation entre le tempo et la *danceability*. En effet, plus le tempo est élevé, plus la *danceability* augmente, jusqu'à un certain point. Au-delà de 120 BPM, la *danceability* semble se stabiliser voir même diminuer. Cela peut s'expliquer par le fait que les morceaux très rapides peuvent devenir trop complexes pour être dansés facilement. Ou encore que l'ensemble des données est très concentré vers les 100 BPM, ce qui fausse la perception de la tendance.
+
+```{r message=FALSE, warning=FALSE}
+# affichage de la repartition du tempo
+dataset %>% ggplot(aes(x = Tempo)) +
+  geom_histogram(binwidth = 5, fill = "steelblue", color = "black", alpha = 0.7) +
+  labs(title = "Répartition du tempo", x = "Tempo (BPM)", y = "Nombre de morceaux") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 18, face = "bold"),
+    axis.title = element_text(size = 14),
+    axis.text = element_text(size = 12)
+  )
+```
+
+En effet on remarque que la forme est similaire à une gaussienne, avec un maximum vers 100 BPM. Cela peut expliquer la tendance observée précédemment. Il n'y aurait donc pas ou très peu de corrélation entre le tempo et la *danceability*.
+
+***
 ### Question 11 : Est-ce qu'une tonalité a un effet sur le type de chanson ? 
 Dans cette question, nous allons examiner les differentes caractéristiques des musiques pour chaque tonalité. Le but est de voir s'il existe une variation des différentes caractéristiques en fonction de la tonalité globale de la chanson.
 

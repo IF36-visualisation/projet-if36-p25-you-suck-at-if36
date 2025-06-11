@@ -21,7 +21,7 @@ library(shinydashboard)
 library(dplyr)
 notes_map <- setNames(0:11, c("Do", "Do / Ré", "Ré", "Ré / Mi", "Mi", "Fa", 
            "Fa / Sol", "Sol", "Sol / La", "La", "La / Si", "Si"))
-dataset <- read_csv('/Users/klim/Downloads/Spotify_Youtube.csv');
+dataset <- read_csv("data/Spotify_Youtube.csv");
 dataset_question_5 <- dataset %>% 
   filter(!is.na(Duration_ms)) %>%
   mutate(Duration_min = (Duration_ms / 1000)/60)
