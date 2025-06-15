@@ -470,6 +470,52 @@ D'après les 4 visualisations ci-dessous, nous avons vu que le dataset present r
 
 Pour le graphique 3, les tonalités les plus presentes sont Do/Ré, Sol et Do. Pour le graphique 4, les tonalités les plus presentes sont Sol et Mi. Ce qui aurait etait pertinent dans l'analyse, c'est d'avoir une la separation entre les gammes majeurs et mineurs egalement.  
 
+### Question 6 : Les vidéos officielles ont-elles plus de vues que les autres ?
+
+**Hypothèse :**
+
+Les vidéos officielles pourraient avoir plus de vues que les autres
+
+**Traitement des données :**
+
+On ne garde "que" les $19549$ vidéos de Youtube.
+
+```{r message=FALSE, warning=FALSE}
+youtube_dataset <- dataset %>%
+  filter(!is.na(Views)) %>%
+  select(where(is.numeric), Views, official_video) %>%
+  na.omit()
+```
+
+**Visualisations :**
+
+On affiche les vues selon si la vidéo est officielle ou non.
+
+```{r message=FALSE, warning=FALSE}
+ggplot(youtube_dataset, aes(y=Views, x=official_video)) + geom_boxplot() +
+  scale_y_continuous(labels=label_number(scale_cut=cut_short_scale()), limits=c(0, 10^7)) +
+  scale_x_discrete(labels=c("Non officielle", "Officielle")) +
+  labs(x = "Type de vidéo", y = "Nombre de vues") +
+  ggtitle("Graphique 1 : Répartition du nombre de vues selon si la vidéo est officielle")
+
+ggplot(youtube_dataset, aes(Views, fill=official_video, color=official_video)) +
+  geom_density(alpha=0.1) +
+  scale_x_continuous(labels=label_number(scale_cut=cut_short_scale()), limits=c(0, 10^7)) +
+  scale_color_discrete(name="Type de vidéo", labels=c("Non officielle", "Officielle")) +
+  scale_fill_discrete(guide="none") +
+  ggtitle("Graphique 2 : Densité du nombre de vues selon si la vidéo est officielle") +
+  labs(x = "Nombre de vues", y = "Densité") +
+  theme(axis.text.y = element_blank())
+```
+
+Afin de bien comprendre ces graphiques, on calcule le nombre de vidéos officielles et non officielles :
+
+| Vidéos officielles | Vidéos non officielles |
+| - | - |
+| 15260 | 4289 |
+
+Les vidéos officielles font donc plus de vues que les vidéos non officielles. On peut noter cependant que nous avons plus de vidéos officielles que de vidéos non officielles dans le dataset. On peut supposer que les artistes connus publient tous leurs musiques dans des musiques "officielles" et que leurs republications se font supprimer par Youtube.
+
 ### Question 7 :  Quelles sont les variables qui influencent les performances sur Youtube et Spotify ?
 
 **Hypothèse :**
