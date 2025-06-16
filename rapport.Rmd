@@ -10,6 +10,38 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+
+plotnum <- 0
+knit_print.ggplot <- function(x, options) {
+  plotnum <<- plotnum + 1
+  ggsave(sprintf("graphics/graph-%02d.png", plotnum), x +
+  theme(
+    panel.background = element_rect(fill='transparent'),
+    plot.background = element_rect(fill='transparent', color=NA),
+    legend.background = element_rect(fill='transparent', colour='transparent', linetype = 'blank'),
+    legend.box.background = element_rect(fill='transparent', colour='transparent', linetype = 'blank')
+  ), bg='transparent')
+  print(x)
+}
+# If having trouble running knit, comment the function below (if it requires the "orca" package)
+knit_print.plotly <- function(x, options, ...) {
+  plotnum <<- plotnum + 1
+  orca(x %>% layout(
+    plot_bgcolor = "rgba(0,0,0,0)",
+    paper_bgcolor = "rgba(0,0,0,0)"
+  ), sprintf("graphics/graph-%02d.png", plotnum), scale = 10)
+  if (!is.null(options$fig.width)) x$width <- options$fig.width * 96
+  if (!is.null(options$fig.height)) x$height <- options$fig.height * 96
+  htmlwidgets:::knit_print.htmlwidget(x, options, ...)
+}
+# This saves the radarchart to png. Uncomment both lines par(bg=NA) and save_plot() to generate export
+save_plot <- function() {
+  plotnum <<- plotnum + 1
+  p <- recordPlot()
+  png(sprintf("graphics/graph-%02d.png", plotnum), bg = "transparent", res = 288, width = 1920, height = 1920)
+  replayPlot(p)
+  dev.off()
+}
 ```
 
 # IF36 \- Proposition
@@ -295,14 +327,14 @@ live_dataset <- dataset %>%
   mutate(is_live = ifelse(Liveness > 0.8, "Live", "Studio"))
 
 # Crée une fonction pour créer les boxplots
-plot_boxplot <- function(data, yvar, ylab, title, subtitle) {
-  ggplot(data, aes_string(x = "is_live", y = yvar, fill = "is_live")) +
+plot_boxplot <- function(data, xvar, yvar,xlab, ylab, title, subtitle) {
+  ggplot(data, aes_string(x = xvar, y = yvar, fill = xvar)) +
     geom_boxplot(outlier.shape = NA, size = 0.7) +
     scale_y_log10(labels = scales::comma) +
     labs(
       title = title,
       subtitle = subtitle,
-      x = "Type de chanson",
+      x = xlab,
       y = ylab,
     ) +
     theme_minimal() +
@@ -317,12 +349,12 @@ plot_boxplot <- function(data, yvar, ylab, title, subtitle) {
 
 # Appel de la fonction pour créer les boxplots
 plot_streams <- plot_boxplot(
-  live_dataset, "Stream", "Nombre d'écoutes (log)",
+  live_dataset, "is_live", "Stream", "Type de chanson", "Nombre d'écoutes (log)",
   "Comparaison des écoutes Spotify", "Entre chansons Live et Studio"
 )
 
 plot_views <- plot_boxplot(
-  live_dataset, "Views", "Nombre de vues (log)",
+  live_dataset, "is_live", "Views", "Type de chanson", "Nombre de vues (log)",
   "Comparaison des vues YouTube", "Entre chansons Live et Studio"
 )
 
@@ -469,6 +501,52 @@ ggplot(dataset_question5_plot4, aes(x = Key, y = n, fill = Key)) +
 D'après les 4 visualisations ci-dessous, nous avons vu que le dataset present respecte bien la durée moyenne d'une chanson, malgré la presence de certains outliers. Pour aller plus loin, nous avons regarder la tonalité des chansons d'une durée moyenne, comparant a la tonalité des chansons d'une durée superieur à 10 minutes. 
 
 Pour le graphique 3, les tonalités les plus presentes sont Do/Ré, Sol et Do. Pour le graphique 4, les tonalités les plus presentes sont Sol et Mi. Ce qui aurait etait pertinent dans l'analyse, c'est d'avoir une la separation entre les gammes majeurs et mineurs egalement.  
+
+### Question 6 : Les vidéos officielles ont-elles plus de vues que les autres ?
+
+**Hypothèse :**
+
+Les vidéos officielles pourraient avoir plus de vues que les autres
+
+**Traitement des données :**
+
+On ne garde "que" les $19549$ vidéos de Youtube.
+
+```{r message=FALSE, warning=FALSE}
+youtube_dataset <- dataset %>%
+  filter(!is.na(Views)) %>%
+  select(where(is.numeric), Views, official_video) %>%
+  na.omit()
+```
+
+**Visualisations :**
+
+On affiche les vues selon si la vidéo est officielle ou non.
+
+```{r message=FALSE, warning=FALSE}
+ggplot(youtube_dataset, aes(y=Views, x=official_video)) + geom_boxplot() +
+  scale_y_log10(labels=label_number(scale_cut=cut_short_scale())) +
+  scale_x_discrete(labels=c("Non officielle", "Officielle")) +
+  labs(x = "Type de vidéo", y = "Nombre de vues") +
+  ggtitle("Graphique 1 : Répartition du nombre de vues selon si la vidéo est officielle")
+
+ggplot(youtube_dataset, aes(Views, fill=official_video, color=official_video)) +
+  geom_density(alpha=0.1) +
+  scale_x_log10(labels=label_number(scale_cut=cut_short_scale())) +
+  scale_color_discrete(name="Type de vidéo", labels=c("Non officielle", "Officielle")) +
+  scale_fill_discrete(guide="none") +
+  ggtitle("Graphique 2 : Densité du nombre de vues selon si la vidéo est officielle") +
+  labs(x = "Nombre de vues", y = "Densité") +
+  theme(axis.text.y = element_blank())
+```
+
+Afin de bien comprendre ces graphiques, on calcule le nombre de vidéos officielles et non officielles :
+
+| Vidéos officielles | Vidéos non officielles |
+| - | - |
+| 15260 | 4289 |
+
+Les vidéos officielles font donc plus de vues que les vidéos non officielles. On peut noter cependant que nous avons plus de vidéos officielles que de vidéos non officielles dans le dataset. On peut supposer que les artistes connus publient tous leurs musiques dans des musiques "officielles" et que leurs republications se font supprimer par Youtube.
 
 ### Question 7 :  Quelles sont les variables qui influencent les performances sur Youtube et Spotify ?
 
@@ -695,6 +773,27 @@ La réponse à la question soulevée par le graphique précédent, à savoir *es
 En effet, les musiques en La et Sol ont des performances moyennes inférieures mais sont plus nombreuses sur Youtube et Spotify.
 
 ***
+### Question 10 : Quelle est la relation entre la présence d’un contenu sous licence et le nombre de vues ?
+
+**Hypothèse **
+
+On peut supposer que les musiques sous licence ont plus de vues que les musiques sans licence. En effet, les musiques sous licence sont souvent des musiques populaires, qui ont été diffusées à la radio ou à la télévision, et qui ont donc plus de chances d'être vues par un plus grand nombre de personnes.
+
+**Visualisation **
+
+Nous allons créer un graphique qui compare le nombre de vues des musiques sous licence et des musiques sans licence. Pour cela, nous allons utiliser un boxplot.
+
+```{r message=FALSE, warning=FALSE}
+plot_boxplot(
+  dataset %>% select(Licensed, Views) %>% na.omit(), 
+  "Licensed", "Views", 
+  "Type de chanson","Nombre de vues (log)",
+  "Comparaison des vues des musiques"," sous licence et sans licence"
+) +
+  scale_x_discrete(labels = c("TRUE" = "Sous licence", "FALSE" = "Non licenciée"))
+```
+
+***
 ### Question 11 : Est-ce qu'une tonalité a un effet sur le type de chanson ? 
 Dans cette question, nous allons examiner les differentes caractéristiques des musiques pour chaque tonalité. Le but est de voir s'il existe une variation des différentes caractéristiques en fonction de la tonalité globale de la chanson.
 
@@ -826,6 +925,7 @@ titles <- c("Do", "Do / Ré", "Ré", "Ré / Mi", "Mi", "Fa", "Fa / Sol", "Sol", 
 # (ça affiche 15 emplacements, donc les 13 étudiants auront de la place)
 op <- par(mar = c(1, 1, 2, 1))
 par(mfrow = c(3, 5))
+#par(bg=NA)
 
 # Créer les radars pour chaque étudiant
 for (i in 1:12) {
@@ -839,6 +939,7 @@ for (i in 1:12) {
 
 # Réinitialiser les paramètres graphiques
 par(op)
+#save_plot();
 ```
 
 
