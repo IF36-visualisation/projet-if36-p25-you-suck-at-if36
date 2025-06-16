@@ -1092,91 +1092,31 @@ Au contraire, on voit que des artistes ayant un fort succès sur YouTube comme C
 
 **Traitement des données :**
 ...
-```{r tsne_streams, message=FALSE, warning=FALSE, echo=FALSE}
-library(Rtsne)
+
+**Visualisations :**
+
+```{r clustering feature selection, message=FALSE, warning=FALSE, echo=FALSE}
 library(plotly)
 library(dplyr)
 
 # Sélection des features numériques pertinentes
-tsne_data <- dataset %>%
-  select(Duration_ms, Tempo, Valence, Liveness, Instrumentalness, Acousticness, Speechiness, Loudness, Key, Energy, Danceability, Stream) %>%
+cluster_analysis_data <- dataset %>%
+  select(Tempo, Valence, Liveness, Loudness, Danceability, Key, Stream) %>%
   na.omit()
 
 # Retirer les doublons sur les colonnes utilisées pour le t-SNE (sans Stream)
-tsne_data_nostream <- tsne_data %>%
+cluster_analysis_data_nostream <- cluster_analysis_data %>%
   select(-Stream) %>%
   distinct()
 # On garde l’index pour retrouver les infos plus tard
-tsne_data <- tsne_data[as.numeric(rownames(tsne_data_nostream)), ]
+cluster_analysis_data <- cluster_analysis_data[as.numeric(rownames(cluster_analysis_data_nostream)), ]
 
 set.seed(42)
-if (nrow(tsne_data_nostream) > 2000) {
-  idx <- sample(nrow(tsne_data_nostream), 2000)
-  tsne_data_nostream <- tsne_data_nostream[idx, ]
-  tsne_data <- tsne_data[idx, ]
-}
-
-# t-SNE en 2D
-tsne_result <- Rtsne(as.matrix(tsne_data_nostream), dims = 2, perplexity = 30, verbose = TRUE, max_iter = 500)
-tsne_df <- as.data.frame(tsne_result$Y)
-colnames(tsne_df) <- c("Dim1", "Dim2")
-
-# Ajout des infos pour le survol et la couleur
-tsne_df$Title <- dataset$Track[as.numeric(rownames(tsne_data))]
-tsne_df$Artist <- dataset$Artist[as.numeric(rownames(tsne_data))]
-tsne_df$Stream <- tsne_data$Stream
-
-# Tooltip personnalisé
-tsne_df$hover <- paste0(
-  "<b>", tsne_df$Title, "</b><br>",
-  "Artiste : ", tsne_df$Artist, "<br>",
-  "Streams Spotify : ", format(tsne_df$Stream, big.mark = " ")
-)
-```
-**Visualisations :**
-
-```{r tsne, echo=FALSE}
-plot_ly(
-  tsne_df,
-  x = ~Dim1, y = ~Dim2,
-  color = ~Stream, colors = "viridis", # other colors can be
-  type = "scatter", mode = "markers",
-  marker = list(size = 6, opacity = 0.7),
-  text = ~hover,
-  hoverinfo = "text"
-) %>%
-  layout(title = "Projection t-SNE 2D des chansons (couleur = nombre de streams Spotify)")
-```
-
-```{r pca, echo=FALSE}
-# PCA
-pca_result <- prcomp(tsne_data_nostream, scale. = TRUE)
-pca_df <- as.data.frame(pca_result$x[, 1:2])
-colnames(pca_df) <- c("PC1", "PC2")
-
-# Ajout des infos pour le survol et la couleur
-pca_df$Title <- dataset$Track[as.numeric(rownames(tsne_data))]
-pca_df$Artist <- dataset$Artist[as.numeric(rownames(tsne_data))]
-pca_df$Stream <- tsne_data$Stream
-
-# Tooltip personnalisé
-pca_df$hover <- paste0(
-  "<b>", pca_df$Title, "</b><br>",
-  "Artiste : ", pca_df$Artist, "<br>",
-  "Streams Spotify : ", format(pca_df$Stream, big.mark = " ")
-)
-
-# Visualisation
-plot_ly(
-  pca_df,
-  x = ~PC1, y = ~PC2,
-  color = ~Stream, colors = "viridis",
-  type = "scatter", mode = "markers",
-  marker = list(size = 6, opacity = 0.7),
-  text = ~hover,
-  hoverinfo = "text"
-) %>%
-  layout(title = "Projection PCA 2D des chansons (couleur = nombre de streams Spotify)")
+# if (nrow(cluster_analysis_data_nostream) > 2000) { # si plus de 2000 lignes, on échantillonne
+#   idx <- sample(nrow(cluster_analysis_data_nostream), 2000) # échantillonnage aléatoire
+#   cluster_analysis_data_nostream <- cluster_analysis_data_nostream[idx, ] # échantillonnage
+#   cluster_analysis_data <- cluster_analysis_data[idx, ] # on garde les infos des streams
+# }
 ```
 
 ```{r umap, echo=FALSE}
@@ -1189,14 +1129,14 @@ umap_config$min_dist <- 0.1
 umap_config$random_state <- 42
 
 # UMAP sur les données numériques
-umap_result <- umap(as.matrix(tsne_data_nostream), config = umap_config)
+umap_result <- umap(as.matrix(cluster_analysis_data_nostream), config = umap_config)
 umap_df <- as.data.frame(umap_result$layout)
 colnames(umap_df) <- c("UMAP1", "UMAP2")
 
 # Ajout des infos
-umap_df$Title <- dataset$Track[as.numeric(rownames(tsne_data))]
-umap_df$Artist <- dataset$Artist[as.numeric(rownames(tsne_data))]
-umap_df$Stream <- tsne_data$Stream
+umap_df$Title <- dataset$Track[as.numeric(rownames(cluster_analysis_data))]
+umap_df$Artist <- dataset$Artist[as.numeric(rownames(cluster_analysis_data))]
+umap_df$Stream <- cluster_analysis_data$Stream
 
 # Tooltip personnalisé
 umap_df$hover <- paste0(
@@ -1216,4 +1156,148 @@ plot_ly(
   hoverinfo = "text"
 ) %>%
   layout(title = "Projection UMAP 2D des chansons (couleur = nombre de streams Spotify)")
+```
+
+```{r cluster analysis with dbscan, echo=FALSE}
+# LIBRAIRIES
+library(dplyr)
+library(dbscan)
+library(Rtsne)
+library(plotly)
+library(scales)
+
+# 1. PRÉPARATION DES DONNÉES --------------------
+features <- cluster_analysis_data_nostream
+
+# Normalisation
+features_scaled <- scale(features)
+
+# 2. CLUSTERING AVEC DBSCAN ---------------------
+
+# Trouver un epsilon adapté peut nécessiter un test (à ajuster si besoin)
+db_result <- dbscan(features_scaled, eps = 0.6, minPts = 10)
+
+# Ajouter les clusters au dataset original
+features$Cluster <- factor(db_result$cluster) # 0 = bruit (outliers)
+dataset_clustered <- dataset[as.numeric(rownames(features)), ]
+dataset_clustered$Cluster <- features$Cluster
+
+# 3. VISUALISATION AVEC t-SNE -------------------
+
+set.seed(123)
+features_scaled_nodup <- features_scaled[!duplicated(features_scaled), ] # retire les doublons
+features_nodup <- features[!duplicated(features_scaled), ] # pour garder la correspondance
+
+tsne_result <- Rtsne(features_scaled_nodup, dims = 2)
+tsne_df <- as.data.frame(tsne_result$Y)
+colnames(tsne_df) <- c("Dim1", "Dim2")
+
+# Utilise les index des lignes non dupliquées pour récupérer les bons titres/artistes
+row_idx <- as.numeric(rownames(features_nodup))
+dataset_clustered_nodup <- dataset_clustered[row_idx, ]
+
+tsne_df$Cluster <- features_nodup$Cluster
+tsne_df$Title <- dataset_clustered_nodup$Track
+tsne_df$Artist <- dataset_clustered_nodup$Artist
+
+# Tooltip
+tsne_df$hover <- paste0(
+  "<b>", tsne_df$Title, "</b><br>",
+  "Artiste : ", tsne_df$Artist, "<br>",
+  "Cluster : ", tsne_df$Cluster
+)
+```
+
+```{r cluster_plot, echo=FALSE, message=FALSE, warning=FALSE}
+library(plotly)
+
+# Crée une liste de traces, une par cluster
+traces <- lapply(unique(tsne_df$Cluster), function(clust) {
+  cluster_data <- tsne_df %>% filter(Cluster == clust)
+  list(
+    x = cluster_data$Dim1,
+    y = cluster_data$Dim2,
+    type = "scatter",
+    mode = "markers",
+    name = paste("Cluster", clust),
+    text = cluster_data$hover,
+    hoverinfo = "text",
+    marker = list(size = 6, opacity = 0.7)
+  )
+})
+
+# Affiche toutes les traces avec un menu pour filtrer
+fig <- plot_ly()
+for (t in traces) {
+  fig <- do.call(add_trace, c(list(fig), t))
+}
+
+# Création du menu de sélection
+buttons <- lapply(seq_along(traces), function(i) {
+  l <- rep(FALSE, length(traces))
+  l[i] <- TRUE
+  list(
+    method = "restyle",
+    args = list("visible", l),
+    label = paste("Cluster", unique(tsne_df$Cluster)[i])
+  )
+})
+
+# Bouton pour tout afficher
+buttons <- append(
+  list(list(method = "restyle", args = list("visible", rep(TRUE, length(traces))), label = "Tous")),
+  buttons
+)
+
+# Ajout du layout avec menu
+fig <- fig %>% layout(
+  title = "Clustering des chansons (filtrable par cluster)",
+  xaxis = list(title = "t-SNE Dim 1"),
+  yaxis = list(title = "t-SNE Dim 2"),
+  updatemenus = list(
+    list(
+      type = "dropdown",
+      direction = "down",
+      x = 0.1,
+      y = 1.1,
+      showactive = TRUE,
+      buttons = buttons
+    )
+  )
+)
+
+fig
+
+# 4. ANALYSE AUTOMATIQUE DES GROUPES -----------
+
+cat("\nRésumé automatique par cluster :\n\n")
+
+summary_table <- dataset_clustered %>%
+  filter(Cluster != 0) %>% # exclure les outliers
+  group_by(Cluster) %>%
+  summarise(
+    n = n(),
+    Energy = mean(Energy, na.rm = TRUE),
+    Danceability = mean(Danceability, na.rm = TRUE),
+    Acousticness = mean(Acousticness, na.rm = TRUE),
+    Instrumentalness = mean(Instrumentalness, na.rm = TRUE),
+    Tempo = mean(Tempo, na.rm = TRUE),
+    Duration = mean(Duration_ms, na.rm = TRUE) / 1000 # en secondes
+  )
+
+print(summary_table)
+```
+
+```{r export_clusters_uri, echo=TRUE, message=FALSE}
+# Crée un dossier pour les clusters si besoin
+if (!dir.exists("clusters_csv")) dir.create("clusters_csv")
+
+# Pour chaque cluster (hors outliers si Cluster==0)
+for (clust in unique(dataset_clustered_nodup$Cluster)) {
+  if (clust == 0) next # on saute les outliers si besoin
+  tracks <- dataset_clustered_nodup %>%
+    filter(Cluster == clust) %>%
+    select(Uri, Cluster)
+  write.csv(tracks, file = paste0("clusters_csv/cluster_", clust, ".csv"), row.names = FALSE, fileEncoding = "UTF-8")
+}
 ```
