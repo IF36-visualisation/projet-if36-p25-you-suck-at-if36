@@ -23,6 +23,7 @@ knit_print.ggplot <- function(x, options) {
   ), bg='transparent')
   print(x)
 }
+# If having trouble running knit, comment the function below (if it requires the "orca" package)
 knit_print.plotly <- function(x, options, ...) {
   plotnum <<- plotnum + 1
   orca(x %>% layout(
@@ -32,6 +33,14 @@ knit_print.plotly <- function(x, options, ...) {
   if (!is.null(options$fig.width)) x$width <- options$fig.width * 96
   if (!is.null(options$fig.height)) x$height <- options$fig.height * 96
   htmlwidgets:::knit_print.htmlwidget(x, options, ...)
+}
+# This saves the radarchart to png. Uncomment both lines par(bg=NA) and save_plot() to generate export
+save_plot <- function() {
+  plotnum <<- plotnum + 1
+  p <- recordPlot()
+  png(sprintf("graphics/graph-%02d.png", plotnum), bg = "transparent", res = 288, width = 1920, height = 1920)
+  replayPlot(p)
+  dev.off()
 }
 ```
 
@@ -916,6 +925,7 @@ titles <- c("Do", "Do / Ré", "Ré", "Ré / Mi", "Mi", "Fa", "Fa / Sol", "Sol", 
 # (ça affiche 15 emplacements, donc les 13 étudiants auront de la place)
 op <- par(mar = c(1, 1, 2, 1))
 par(mfrow = c(3, 5))
+#par(bg=NA)
 
 # Créer les radars pour chaque étudiant
 for (i in 1:12) {
@@ -929,6 +939,7 @@ for (i in 1:12) {
 
 # Réinitialiser les paramètres graphiques
 par(op)
+#save_plot();
 ```
 
 
