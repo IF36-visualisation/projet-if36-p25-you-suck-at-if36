@@ -15,12 +15,12 @@ plotnum <- 0
 knit_print.ggplot <- function(x, options) {
   plotnum <<- plotnum + 1
   ggsave(sprintf("graphics/graph-%02d.png", plotnum), x +
-  theme(
-    panel.background = element_rect(fill='transparent'),
-    plot.background = element_rect(fill='transparent', color=NA),
-    legend.background = element_rect(fill='transparent', colour='transparent', linetype = 'blank'),
-    legend.box.background = element_rect(fill='transparent', colour='transparent', linetype = 'blank')
-  ), bg='transparent')
+    theme(
+      panel.background = element_rect(fill = "transparent"),
+      plot.background = element_rect(fill = "transparent", color = NA),
+      legend.background = element_rect(fill = "transparent", colour = "transparent", linetype = "blank"),
+      legend.box.background = element_rect(fill = "transparent", colour = "transparent", linetype = "blank")
+    ), bg = "transparent")
   print(x)
 }
 # If having trouble running knit, comment the function below (if it requires the "orca" package)
@@ -327,7 +327,7 @@ live_dataset <- dataset %>%
   mutate(is_live = ifelse(Liveness > 0.8, "Live", "Studio"))
 
 # Crée une fonction pour créer les boxplots
-plot_boxplot <- function(data, xvar, yvar,xlab, ylab, title, subtitle) {
+plot_boxplot <- function(data, xvar, yvar, xlab, ylab, title, subtitle) {
   ggplot(data, aes_string(x = xvar, y = yvar, fill = xvar)) +
     geom_boxplot(outlier.shape = NA, size = 0.7) +
     scale_y_log10(labels = scales::comma) +
@@ -524,17 +524,18 @@ youtube_dataset <- dataset %>%
 On affiche les vues selon si la vidéo est officielle ou non.
 
 ```{r message=FALSE, warning=FALSE}
-ggplot(youtube_dataset, aes(y=Views, x=official_video)) + geom_boxplot() +
-  scale_y_log10(labels=label_number(scale_cut=cut_short_scale())) +
-  scale_x_discrete(labels=c("Non officielle", "Officielle")) +
+ggplot(youtube_dataset, aes(y = Views, x = official_video)) +
+  geom_boxplot() +
+  scale_y_log10(labels = label_number(scale_cut = cut_short_scale())) +
+  scale_x_discrete(labels = c("Non officielle", "Officielle")) +
   labs(x = "Type de vidéo", y = "Nombre de vues") +
   ggtitle("Graphique 1 : Répartition du nombre de vues selon si la vidéo est officielle")
 
-ggplot(youtube_dataset, aes(Views, fill=official_video, color=official_video)) +
-  geom_density(alpha=0.1) +
-  scale_x_log10(labels=label_number(scale_cut=cut_short_scale())) +
-  scale_color_discrete(name="Type de vidéo", labels=c("Non officielle", "Officielle")) +
-  scale_fill_discrete(guide="none") +
+ggplot(youtube_dataset, aes(Views, fill = official_video, color = official_video)) +
+  geom_density(alpha = 0.1) +
+  scale_x_log10(labels = label_number(scale_cut = cut_short_scale())) +
+  scale_color_discrete(name = "Type de vidéo", labels = c("Non officielle", "Officielle")) +
+  scale_fill_discrete(guide = "none") +
   ggtitle("Graphique 2 : Densité du nombre de vues selon si la vidéo est officielle") +
   labs(x = "Nombre de vues", y = "Densité") +
   theme(axis.text.y = element_blank())
@@ -785,10 +786,10 @@ Nous allons créer un graphique qui compare le nombre de vues des musiques sous 
 
 ```{r message=FALSE, warning=FALSE}
 plot_boxplot(
-  dataset %>% select(Licensed, Views) %>% na.omit(), 
-  "Licensed", "Views", 
-  "Type de chanson","Nombre de vues (log)",
-  "Comparaison des vues des musiques"," sous licence et sans licence"
+  dataset %>% select(Licensed, Views) %>% na.omit(),
+  "Licensed", "Views",
+  "Type de chanson", "Nombre de vues (log)",
+  "Comparaison des vues des musiques", " sous licence et sans licence"
 ) +
   scale_x_discrete(labels = c("TRUE" = "Sous licence", "FALSE" = "Non licenciée"))
 ```
@@ -925,7 +926,7 @@ titles <- c("Do", "Do / Ré", "Ré", "Ré / Mi", "Mi", "Fa", "Fa / Sol", "Sol", 
 # (ça affiche 15 emplacements, donc les 13 étudiants auront de la place)
 op <- par(mar = c(1, 1, 2, 1))
 par(mfrow = c(3, 5))
-#par(bg=NA)
+# par(bg=NA)
 
 # Créer les radars pour chaque étudiant
 for (i in 1:12) {
@@ -939,7 +940,7 @@ for (i in 1:12) {
 
 # Réinitialiser les paramètres graphiques
 par(op)
-#save_plot();
+# save_plot();
 ```
 
 
@@ -969,6 +970,60 @@ D'après les 3 visualisations ci-dessus, nous pouvons constater que la tonalité
 La question a été répondue, mais cette réponse n'est pas la même que dans les hypothèses posées ci-dessus. Ce qui peut être envisagé, c'est de vérifier comment les scores ont été calculés par les algorithmes de Spotify et de YouTube.
 
 ***
+### Question 12 : Est-ce qu’un compte YouTube officiel est plus populaire qu’un compte fan ?
+
+**Hypothèse :**  
+On suppose que les comptes officiels sont plus populaires (plus de Likes) que les comptes fans.
+
+**Traitement des données :**  
+Pour chaque artiste, on considère le compte comme "officiel" si au moins la moitié de ses vidéos ont `official_video == TRUE`. Sinon, il est classé comme "fan".  
+On compare ensuite la popularité (Likes) des vidéos selon le type de compte.
+
+```{r question12_officiel_vs_fan, message=FALSE, warning=FALSE}
+# Détermination du type de compte pour chaque artiste
+artiste_type <- dataset %>%
+  group_by(Channel) %>%
+  summarise(
+    n = n(),
+    n_official = sum(official_video == TRUE, na.rm = TRUE)
+  ) %>%
+  mutate(Type_compte = ifelse(n_official >= n / 2, "Officiel", "Fan"))
+
+# Ajout de la variable Type_compte au dataset
+dataset_type <- dataset %>%
+  left_join(artiste_type %>% select(Channel, Type_compte), by = "Channel") %>%
+  filter(!is.na(Type_compte), !is.na(Likes), Likes > 0)
+
+# Boxplot Likes par type de compte
+library(ggplot2)
+library(scales)
+ggplot(dataset_type, aes(x = Type_compte, y = Likes, fill = Type_compte)) +
+  geom_boxplot(outlier.shape = NA, alpha = 0.7) +
+  scale_y_log10(labels = label_number(scale_cut = cut_short_scale())) +
+  stat_summary(
+    fun = median, geom = "text", aes(label = scales::comma(round(..y..))),
+    vjust = -0.7, color = "black", size = 5
+  ) +
+  labs(
+    title = "Popularité des comptes YouTube officiels vs fans",
+    x = "Type de compte YouTube",
+    y = "Nombre de Likes (échelle log)"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    axis.title = element_text(size = 13),
+    axis.text = element_text(size = 11),
+    legend.position = "none"
+  )
+```
+
+**Observation :**  
+Le boxplot ci-dessus montre la distribution du nombre de Likes pour les comptes officiels et fans.  
+On constate que les comptes officiels ont une médiane de Likes plus élevée, ce qui confirme l’hypothèse d’une plus grande popularité.  
+L’échelle logarithmique permet de mieux visualiser la dispersion et les valeurs extrêmes.
+
+---
 
 ### Question 13 : Quel artiste est le plus populaire au moment du 7 février 2023 ?  
 Nous allons analyser cela selon :
@@ -1004,95 +1059,77 @@ cat("Nombre total de musiques après suppression :", total_musiques, "\n")
 ```
 **Visualisations :**
 
-```{r message=FALSE, warning=FALSE, fig.height=10, fig.width=8, dpi=130}
-# Top 50 artistes selon les vues YouTube
-top_views <- dataset %>%
+```{r question13_stacked_horizontal, message=FALSE, warning=FALSE, fig.height=12, fig.width=10, dpi=110}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+# Top 20 YouTube
+top_yt <- dataset %>%
   group_by(Artist) %>%
   summarise(Total_Views = sum(Views, na.rm = TRUE)) %>%
   arrange(desc(Total_Views)) %>%
-  slice_head(n = 50) %>%
-  mutate(Rank_Youtube = row_number())
+  slice_head(n = 20)
 
-# Graphique
-ggplot(top_views, aes(
-  x = Total_Views / 1e6,
-  y = reorder(paste(Rank_Youtube, Artist, sep = " - "), Total_Views)
-)) +
-  geom_point(size = 3) +
-  geom_text(aes(label = round(Total_Views / 1e6, 1)), hjust = -0.5, size = 2.5) +
-  labs(
-    title = "Top 50 artistes - Vues YouTube",
-    x = "Nombre de vues (en millions)",
-    y = "Artiste"
-  ) +
-  scale_x_continuous(labels = comma, expand = expansion(mult = c(0, 0.15))) +
-  theme_minimal() +
-  theme(
-    plot.margin = margin(10, 40, 10, 10), # marges plus larges à droite
-    axis.text.y = element_text(size = 6) # textes des artistes plus petits pour aérer
-  )
-```
-
-```{r message=FALSE, warning=FALSE, fig.height=10, fig.width=8, dpi=130}
-# Top 50 artistes selon les streams Spotify
-top_streams <- dataset %>%
+# Top 20 Spotify
+top_sp <- dataset %>%
   group_by(Artist) %>%
   summarise(Total_Streams = sum(Stream, na.rm = TRUE)) %>%
   arrange(desc(Total_Streams)) %>%
-  slice_head(n = 50) %>%
-  mutate(Rank_Spotify = row_number())
+  slice_head(n = 20)
 
-# Graphique
-ggplot(top_streams, aes(
-  x = Total_Streams / 1e6,
-  y = reorder(paste(Rank_Spotify, Artist, sep = " - "), Total_Streams)
-)) +
-  geom_point(size = 3) +
-  geom_text(aes(label = round(Total_Streams / 1e6, 1)), hjust = -0.5, size = 2.5) +
-  labs(
-    title = "Top 50 artistes - Écoutes Spotify",
-    x = "Nombre d'écoutes (en millions)",
-    y = "Artiste"
-  ) +
-  scale_x_continuous(labels = comma, expand = expansion(mult = c(0, 0.15))) +
-  theme_minimal() +
-  theme(
-    plot.margin = margin(10, 40, 10, 10), # marges plus larges à droite
-    axis.text.y = element_text(size = 6) # textes des artistes plus petits pour aérer
-  )
-```
-On constate que certains artistes affichent des disparités entre vues et streams. Par exemple, Post Malone est premier en nombre de streams Spotify mais se classe seulement $37^e$ en vues YouTube, tandis que CoComelon est deuxième en vues YouTube sans apparaître dans le top Spotify.
-Cela confirme l'idée que la plateforme impacte la visibilité et la consommation de certains artistes.
-```{r message=FALSE, warning=FALSE, fig.height=10, fig.width=8, dpi=130}
-# Top 50 artistes combiné (Vues + Streams)
-top_combined <- dataset %>%
+# Fusion sans doublons
+top_artists <- union(top_yt$Artist, top_sp$Artist)
+
+# Récupération des valeurs pour chaque artiste
+top_df <- dataset %>%
+  filter(Artist %in% top_artists) %>%
   group_by(Artist) %>%
   summarise(
-    Total_Views = sum(Views, na.rm = TRUE),
-    Total_Streams = sum(Stream, na.rm = TRUE)
+    Vues_YouTube = sum(Views, na.rm = TRUE),
+    Ecoutes_Spotify = sum(Stream, na.rm = TRUE)
   ) %>%
-  mutate(Score = Total_Views + Total_Streams) %>%
-  arrange(desc(Score)) %>%
-  slice_head(n = 50) %>%
-  mutate(Rank_Combined = row_number())
+  mutate(Score_combine = Vues_YouTube + Ecoutes_Spotify) %>%
+  arrange(desc(Score_combine))
 
-# Graphique
-ggplot(top_combined, aes(
-  x = Score / 1e6,
-  y = reorder(paste(Rank_Combined, Artist, sep = " - "), Score)
+# Passage au format long
+top_long <- top_df %>%
+  pivot_longer(
+    cols = c(Vues_YouTube, Ecoutes_Spotify),
+    names_to = "Plateforme",
+    values_to = "Valeur"
+  )
+
+# Renommage pour la légende
+top_long$Plateforme <- factor(top_long$Plateforme,
+  levels = c("Ecoutes_Spotify", "Vues_YouTube"),
+  labels = c("Spotify", "YouTube")
+)
+
+# Stacked barplot horizontal avec valeurs affichées
+ggplot(top_long, aes(
+  y = reorder(Artist, top_df$Score_combine[match(Artist, top_df$Artist)]),
+  x = Valeur / 1e6,
+  fill = Plateforme
 )) +
-  geom_point(size = 3) +
-  geom_text(aes(label = round(Score / 1e6, 1)), hjust = -0.5, size = 2.5) +
-  labs(
-    title = "Top 50 artistes - Score combiné (Vues + Écoutes)",
-    x = "Score combiné (en millions)",
-    y = "Artiste"
+  geom_bar(stat = "identity") +
+  geom_text(
+    aes(label = round(Valeur / 1e6, 1)),
+    position = position_stack(vjust = 0.5),
+    size = 3, color = "black"
   ) +
-  scale_x_continuous(labels = comma, expand = expansion(mult = c(0, 0.15))) +
+  labs(
+    title = "Top artistes (YouTube & Spotify) : Popularité cumulée par plateforme",
+    y = "Artiste",
+    x = "Nombre (en millions)",
+    fill = "Plateforme"
+  ) +
+  scale_fill_manual(values = c("Spotify" = "#1ED760", "YouTube" = "#FF0000")) +
   theme_minimal() +
   theme(
-    plot.margin = margin(10, 40, 10, 10), # marges plus larges à droite
-    axis.text.y = element_text(size = 6) # textes des artistes plus petits pour aérer
+    axis.text.y = element_text(size = 9),
+    axis.text.x = element_text(size = 10),
+    plot.margin = margin(10, 30, 10, 10)
   )
 ```
 On obtient une vision plus complète de la popularité des artistes.
@@ -1107,7 +1144,7 @@ Des stars internationales remplissent le sommet du top : Justin Bieber, Coldplay
 - Post Malone ($4^e$ combiné) a plus du double de streams Spotify que de vues YouTube (typé audio/Spotify).
 - Luis Fonsi et Daddy Yankee : leur classement est boosté par d'énormes succès vidéo (ex: Despacito) mais leur streaming audio pur est plus faible.
 - CoComelon (contenu enfant) : extrêmement populaire sur YouTube, beaucoup moins sur Spotify (presque anecdotique en streaming pur).
-- Certains artistes comme Coldplay, Imagine Dragons, Bruno Mars performent de façon équilibrée entre plateformes.
+- Certains artistes comme Coldplay, Imagine Dragons ou encore Bruno Mars performent de façon équilibrée entre plateformes.
 
 La liste montre une très forte dominance de la pop et du hip-hop/RnB mais aussi de quelques artistes de musique latine.
 
