@@ -320,7 +320,7 @@ Nous remarquons que le nombre de musique live n'est que de 385, soit environ 2% 
 
 **Visualisations :**
 
-``` {r message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE}
 # Crée une variable pour différencier les morceaux live et studio
 live_dataset <- dataset %>%
   filter(!is.na(Liveness)) %>%
@@ -686,7 +686,7 @@ Certaines tonalités sont peut être plus présentes que d'autres dans le datase
 
 **Traitement des données**
 
-Afin de pouvoir utiliser les données correctement et d'afficher les résultats de manière lisible, on va transformer les codes des différentes tonalités en leur valeur (ex. 0 = Do). Par la même occasion, on crée une catégorie pour les musiques dont la tonalité n'a pas pu être déterminée. On retire également les colonnes inutiles.
+Afin de pouvoir utiliser les données correctement et d'afficher les résultats de manière lisible, on va transformer les codes des différentes tonalités en leur valeur (ex. 0 = Do). Par la même occasion, on crée une catégorie pour les musiques dont la tonalité n'a pu être déterminée. On retire également les colonnes inutiles.
 
 ```{r message=FALSE, warning=FALSE}
 keys <- dataset %>%
@@ -865,8 +865,7 @@ graphe_11_c <- data.frame(avg_Tempo[1], avg_Loudness[2])
 
 **Visualisation**
 
-Dans le plan d'analyse initial, nous avons proposé de creer un barplot par tonalité. Cependant, cette méthode ne sera pas pertinente pour trouver une corrélation. Ainsi, un group bar chart est plus adapté. La plupart des caractéristiques sont des scores allant de 0 à 1, sauf le Tempo (entre 0 et 125BPM) et la Loudness (entre -9 et 0 dB). Ainsi, pour garder une bonne lisibilité, nous avons décidé de faire 3 graphes : 1 grouped bar chart avec les scores, 1 bar chart avec le Tempo, et 1 bar chart avec la Loudness.
-
+Le premier graphe est un grouped bar chart, afin de voir la repartition des valeurs pour chaque tonalité. Les deux autres graphes sont des boxplots, afin de voir la repartition de la tonalité pour les valeurs extremes (en dessous de 3 minutes et au dessus de 10 minutes).
 
 Affichage du graphique 1
 ```{r message=FALSE, warning=FALSE}
@@ -1198,6 +1197,7 @@ ggplot(spotify_only_dataset, aes(Total_Views / 1e6, reorder(Artist, Total_Views)
   theme_minimal() +
   theme(
     axis.text.y = element_text(size = 6),
+    axis.text.x = element_text(size = 10),
     plot.margin = margin(10, 40, 10, 10)
   )
 
@@ -1214,6 +1214,7 @@ ggplot(youtube_only_dataset, aes(Total_Streams / 1e6, reorder(Artist, Total_Stre
   theme_minimal() +
   theme(
     axis.text.y = element_text(size = 6),
+    axis.text.x = element_text(size = 10),
     plot.margin = margin(10, 40, 10, 10)
   )
 ```
@@ -1231,187 +1232,58 @@ Au contraire, on voit que des artistes ayant un fort succès sur YouTube comme C
 **Traitement des données :**
 ...
 
-**Visualisations :**
+**Visualisations : **
 
-```{r clustering feature selection, message=FALSE, warning=FALSE, echo=FALSE}
-library(plotly)
+```{r question14_umap_dbscan, message=FALSE, warning=FALSE, echo=FALSE}
 library(dplyr)
-
-# Sélection des features numériques pertinentes
-cluster_analysis_data <- dataset %>%
-  select(Tempo, Valence, Liveness, Loudness, Danceability, Key, Stream) %>%
-  na.omit()
-
-# Retirer les doublons sur les colonnes utilisées pour le t-SNE (sans Stream)
-cluster_analysis_data_nostream <- cluster_analysis_data %>%
-  select(-Stream) %>%
-  distinct()
-# On garde l’index pour retrouver les infos plus tard
-cluster_analysis_data <- cluster_analysis_data[as.numeric(rownames(cluster_analysis_data_nostream)), ]
+library(umap)
+library(dbscan)
+library(plotly)
+library(FNN)
+library(RColorBrewer)
 
 set.seed(42)
-# if (nrow(cluster_analysis_data_nostream) > 2000) { # si plus de 2000 lignes, on échantillonne
-#   idx <- sample(nrow(cluster_analysis_data_nostream), 2000) # échantillonnage aléatoire
-#   cluster_analysis_data_nostream <- cluster_analysis_data_nostream[idx, ] # échantillonnage
-#   cluster_analysis_data <- cluster_analysis_data[idx, ] # on garde les infos des streams
-# }
-```
 
-```{r umap, echo=FALSE}
-library(umap)
+# 1. Sélection et échantillonnage
+cluster_data <- dataset %>%
+  select(Tempo, Valence, Liveness, Loudness, Danceability, Key, Stream, Track, Artist, Energy, Acousticness, Instrumentalness, Duration_ms, Uri) %>%
+  na.omit()
 
-# Configuration UMAP
+if (nrow(cluster_data) > 2000) {
+  idx <- sample(nrow(cluster_data), 2000)
+  cluster_data <- cluster_data[idx, ]
+}
+
+features <- cluster_data %>%
+  select(Tempo, Valence, Liveness, Loudness, Danceability, Key, Stream)
+
+# 2. UMAP
 umap_config <- umap.defaults
 umap_config$n_neighbors <- 15
 umap_config$min_dist <- 0.1
 umap_config$random_state <- 42
 
-# UMAP sur les données numériques
-umap_result <- umap(as.matrix(cluster_analysis_data_nostream), config = umap_config)
+umap_result <- umap(as.matrix(features), config = umap_config)
 umap_df <- as.data.frame(umap_result$layout)
 colnames(umap_df) <- c("UMAP1", "UMAP2")
 
-# Ajout des infos
-umap_df$Title <- dataset$Track[as.numeric(rownames(cluster_analysis_data))]
-umap_df$Artist <- dataset$Artist[as.numeric(rownames(cluster_analysis_data))]
-umap_df$Stream <- cluster_analysis_data$Stream
+# 3. Recherche automatique d'epsilon pour DBSCAN (méthode du kNN)
+k <- 10
+knn_dist <- FNN::knn.dist(umap_df, k = k)
+eps_auto <- quantile(knn_dist[, k], 0.98) # 98e percentile
 
-# Tooltip personnalisé
-umap_df$hover <- paste0(
-  "<b>", umap_df$Title, "</b><br>",
-  "Artiste : ", umap_df$Artist, "<br>",
-  "Streams Spotify : ", format(umap_df$Stream, big.mark = " ")
-)
+# 4. DBSCAN sur UMAP
+db <- dbscan(umap_df, eps = eps_auto, minPts = k)
+umap_df$Cluster <- factor(db$cluster)
+umap_df$Track <- cluster_data$Track
+umap_df$Artist <- cluster_data$Artist
 
-# Visualisation avec plotly
-plot_ly(
-  umap_df,
-  x = ~UMAP1, y = ~UMAP2,
-  color = ~Stream, colors = "viridis",
-  type = "scatter", mode = "markers",
-  marker = list(size = 6, opacity = 0.7),
-  text = ~hover,
-  hoverinfo = "text"
-) %>%
-  layout(title = "Projection UMAP 2D des chansons (couleur = nombre de streams Spotify)")
-```
+# Pour résumé automatique, on rattache les clusters à cluster_data
+cluster_data$Cluster <- umap_df$Cluster
 
-```{r cluster analysis with dbscan, echo=FALSE}
-# LIBRAIRIES
-library(dplyr)
-library(dbscan)
-library(Rtsne)
-library(plotly)
-library(scales)
-
-# 1. PRÉPARATION DES DONNÉES --------------------
-features <- cluster_analysis_data_nostream
-
-# Normalisation
-features_scaled <- scale(features)
-
-# 2. CLUSTERING AVEC DBSCAN ---------------------
-
-# Trouver un epsilon adapté peut nécessiter un test (à ajuster si besoin)
-db_result <- dbscan(features_scaled, eps = 0.6, minPts = 10)
-
-# Ajouter les clusters au dataset original
-features$Cluster <- factor(db_result$cluster) # 0 = bruit (outliers)
-dataset_clustered <- dataset[as.numeric(rownames(features)), ]
-dataset_clustered$Cluster <- features$Cluster
-
-# 3. VISUALISATION AVEC t-SNE -------------------
-
-set.seed(123)
-features_scaled_nodup <- features_scaled[!duplicated(features_scaled), ] # retire les doublons
-features_nodup <- features[!duplicated(features_scaled), ] # pour garder la correspondance
-
-tsne_result <- Rtsne(features_scaled_nodup, dims = 2)
-tsne_df <- as.data.frame(tsne_result$Y)
-colnames(tsne_df) <- c("Dim1", "Dim2")
-
-# Utilise les index des lignes non dupliquées pour récupérer les bons titres/artistes
-row_idx <- as.numeric(rownames(features_nodup))
-dataset_clustered_nodup <- dataset_clustered[row_idx, ]
-
-tsne_df$Cluster <- features_nodup$Cluster
-tsne_df$Title <- dataset_clustered_nodup$Track
-tsne_df$Artist <- dataset_clustered_nodup$Artist
-
-# Tooltip
-tsne_df$hover <- paste0(
-  "<b>", tsne_df$Title, "</b><br>",
-  "Artiste : ", tsne_df$Artist, "<br>",
-  "Cluster : ", tsne_df$Cluster
-)
-```
-
-```{r cluster_plot, echo=FALSE, message=FALSE, warning=FALSE}
-library(plotly)
-
-# Crée une liste de traces, une par cluster
-traces <- lapply(unique(tsne_df$Cluster), function(clust) {
-  cluster_data <- tsne_df %>% filter(Cluster == clust)
-  list(
-    x = cluster_data$Dim1,
-    y = cluster_data$Dim2,
-    type = "scatter",
-    mode = "markers",
-    name = paste("Cluster", clust),
-    text = cluster_data$hover,
-    hoverinfo = "text",
-    marker = list(size = 6, opacity = 0.7)
-  )
-})
-
-# Affiche toutes les traces avec un menu pour filtrer
-fig <- plot_ly()
-for (t in traces) {
-  fig <- do.call(add_trace, c(list(fig), t))
-}
-
-# Création du menu de sélection
-buttons <- lapply(seq_along(traces), function(i) {
-  l <- rep(FALSE, length(traces))
-  l[i] <- TRUE
-  list(
-    method = "restyle",
-    args = list("visible", l),
-    label = paste("Cluster", unique(tsne_df$Cluster)[i])
-  )
-})
-
-# Bouton pour tout afficher
-buttons <- append(
-  list(list(method = "restyle", args = list("visible", rep(TRUE, length(traces))), label = "Tous")),
-  buttons
-)
-
-# Ajout du layout avec menu
-fig <- fig %>% layout(
-  title = "Clustering des chansons (filtrable par cluster)",
-  xaxis = list(title = "t-SNE Dim 1"),
-  yaxis = list(title = "t-SNE Dim 2"),
-  updatemenus = list(
-    list(
-      type = "dropdown",
-      direction = "down",
-      x = 0.1,
-      y = 1.1,
-      showactive = TRUE,
-      buttons = buttons
-    )
-  )
-)
-
-fig
-
-# 4. ANALYSE AUTOMATIQUE DES GROUPES -----------
-
-cat("\nRésumé automatique par cluster :\n\n")
-
-summary_table <- dataset_clustered %>%
-  filter(Cluster != 0) %>% # exclure les outliers
+# 5. Résumé automatique par cluster (hors outliers)
+dataset_clustered_nodup <- cluster_data %>% filter(Cluster != 0)
+summary_table <- dataset_clustered_nodup %>%
   group_by(Cluster) %>%
   summarise(
     n = n(),
@@ -1423,7 +1295,32 @@ summary_table <- dataset_clustered %>%
     Duration = mean(Duration_ms, na.rm = TRUE) / 1000 # en secondes
   )
 
+cat("\nRésumé automatique par cluster :\n\n")
 print(summary_table)
+
+# 6. Visualisation interactive
+umap_df$hover <- paste0(
+  "<b>", umap_df$Track, "</b><br>",
+  "Artiste : ", umap_df$Artist, "<br>",
+  "Cluster : ", umap_df$Cluster
+)
+
+cols <- c(RColorBrewer::brewer.pal(8, "Set2"), "grey70")
+n_clust <- length(unique(umap_df$Cluster))
+palette_size <- max(n_clust, 9)
+cols <- c(colorRampPalette(RColorBrewer::brewer.pal(8, "Set2"))(palette_size), "grey70")
+col_scale <- setNames(cols[seq_len(n_clust)], sort(unique(umap_df$Cluster)))
+col_scale["0"] <- "grey70" # outliers
+
+plot_ly(
+  umap_df,
+  x = ~UMAP1, y = ~UMAP2,
+  color = ~Cluster, colors = col_scale,
+  type = "scatter", mode = "markers",
+  marker = list(size = 7, opacity = 0.7),
+  text = ~hover, hoverinfo = "text"
+) %>%
+  layout(title = "Clusters DBSCAN sur UMAP (échantillon de 2000 chansons)")
 ```
 
 ```{r export_clusters_uri, echo=TRUE, message=FALSE}
@@ -1435,7 +1332,7 @@ for (clust in unique(dataset_clustered_nodup$Cluster)) {
   if (clust == 0) next # on saute les outliers si besoin
   tracks <- dataset_clustered_nodup %>%
     filter(Cluster == clust) %>%
-    select(Uri, Cluster)
+    select(Uri, Track, Artist, Cluster)
   write.csv(tracks, file = paste0("clusters_csv/cluster_", clust, ".csv"), row.names = FALSE, fileEncoding = "UTF-8")
 }
 ```
