@@ -6,7 +6,7 @@ library(ggplot2)
 library(scales) # pour comma()
 
 # Chargement des données
-dataset <- read_csv('/Users/klim/Downloads/Spotify_Youtube.csv')
+dataset <- read_csv("../data/Spotify_Youtube.csv")
 
 # Pré-calculs des top 3 (pour les infoBoxes & valueBoxes)
 top_views3 <- dataset %>%
