@@ -24,16 +24,16 @@ knit_print.ggplot <- function(x, options) {
   print(x)
 }
 # If having trouble running knit, comment the function below (if it requires the "orca" package)
-knit_print.plotly <- function(x, options, ...) {
-  plotnum <<- plotnum + 1
-  orca(x %>% layout(
-    plot_bgcolor = "rgba(0,0,0,0)",
-    paper_bgcolor = "rgba(0,0,0,0)"
-  ), sprintf("graphics/graph-%02d.png", plotnum), scale = 10)
-  if (!is.null(options$fig.width)) x$width <- options$fig.width * 96
-  if (!is.null(options$fig.height)) x$height <- options$fig.height * 96
-  htmlwidgets:::knit_print.htmlwidget(x, options, ...)
-}
+# knit_print.plotly <- function(x, options, ...) {
+#   plotnum <<- plotnum + 1
+#   orca(x %>% layout(
+#     plot_bgcolor = "rgba(0,0,0,0)",
+#     paper_bgcolor = "rgba(0,0,0,0)"
+#   ), sprintf("graphics/graph-%02d.png", plotnum), scale = 10)
+#   if (!is.null(options$fig.width)) x$width <- options$fig.width * 96
+#   if (!is.null(options$fig.height)) x$height <- options$fig.height * 96
+#   htmlwidgets:::knit_print.htmlwidget(x, options, ...)
+# }
 # This saves the radarchart to png. Uncomment both lines par(bg=NA) and save_plot() to generate export
 save_plot <- function() {
   plotnum <<- plotnum + 1
@@ -90,7 +90,7 @@ Le dataset utilisé est complet et ne devrait pas nécessiter de traitement de d
 
 # Chargement des Librairies utilisées
 
-Dans le cadre de ce projet, nous avons utilisé plusieurs bibliothèques, afin d'analyser, traiter et visualiser les données. Les bibliothèques utilisées sont : *ggplot2, scales, readr, dplyr, magrittr, tidyr, boot, forcats* et *fmsb*.
+Dans le cadre de ce projet, nous avons utilisé plusieurs bibliothèques, afin d'analyser, traiter et visualiser les données. Les bibliothèques utilisées sont : *ggplot2, scales, readr, dplyr, magrittr, tidyr, boot, forcats, hexbin* et *fmsb*.
 
 ```{r libraries, echo=TRUE, warning=FALSE}
 library(ggplot2)
@@ -102,6 +102,7 @@ library(tidyr)
 library(boot)
 library(forcats)
 library(fmsb)
+library(hexbin)
 ```
 
 # Chargement du dataset
