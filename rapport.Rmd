@@ -91,7 +91,10 @@ Le dataset utilisé est complet et ne devrait pas nécessiter de traitement de d
 * `Description`
 
 ## Chargement des Librairies utilisées
-```{r libraries, message=FALSE, warning=FALSE}
+
+Dans le cadre de ce projet, nous avons utilisé plusieurs bibliotheques, afin d'analyser, traiter et visualiser les données. Les bibliotheques utilisés sont : *ggplot2, scales, readr, dplyr, magrittr, tidyr, boot, forcats* et *fmsb*.
+
+```{r libraries, echo=TRUE, warning=FALSE}
 library(ggplot2)
 library(scales)
 library(readr)
@@ -101,42 +104,62 @@ library(tidyr)
 library(boot)
 library(forcats)
 library(fmsb)
+```
+
+## Chargement du dataset
+
+Le dataset utilisé se trouve dans le repertoire "data" et le fichier est nommé "Spotify_Youtube.csv". Il comporte toutes les données utilisés durant le projet.
+
+```{r dataset, echo=TRUE, message=FALSE, warning=FALSE}
+dataset <- read_csv('/Users/klim/Downloads/Spotify_Youtube.csv');
 
 ## Define theme colors to use for graphs
 theme <- "#63a0e1"
 darktheme <- "#2e7bcf"
 ```
 
-## Chargement du dataset
-```{r dataset, message=FALSE, warning=FALSE}
-dataset <- read_csv("data/Spotify_Youtube.csv")
-```
-
 ## Analyse detaillée du dataset
+
+L'analyse du dataset est separé en 3 grandes parties : **_Exploration_**, **_Impact sur le success_** et **_Clustering_**. Dans la premiere partie, nous avons effectué plusieurs analyses sur les features d'une chanson, afin de comprendre la distribution des differentes caracteristiques, mais aussi de trouver des correlations existantes entre eux. La deuxieme partie d'analyse se concentre sur la recherche de differentes points, qui influences le succes d'une chanson comparant à une autre. Pour finir ce projet, nous avons essayé de mettre en oeuvre un algorithme de clustering.
+
+---
+
+### Exploration
 
 ### Question 1 : Quelle est la repartition des types d'album dans le dataset ? 
 L'objectif est de visualiser la fréquence des chansons issues d'albums par rapport aux singles.
 
-
 **Hypothèses**
+Nous pensons, que le nombre des singles doit etre important que celui d'albums. En effet, depuis 2016, le nombre d'albums sorties en en déclin, tandis que le nomrbe des "EPs" et des singles est en augmentation.
 
 **Traitement des données**
 
-Ici, nous allons voir si dans la colonne Album_type nous avons des doublons ou des fautes de frappe ("Single" ou "sInGle")
+Avant de pouvoir visualiser cette repartition, il faut s'assurer que le dataset ne comporte pas des types incoherentes, tel que "SinGLES" et "Abums".
+
 ```{r message=FALSE, warning=FALSE}
 unique(dataset$Album_type)
 ```
 
+D'apres l'affichage ci-dessus, il n'y pas de valeurs incoherentes. Nous pouvons egalement voir que le dataset comporte 3 types d'albums : album, single et compilation. Le type compilation, correspond à un playlist fait par un utilisateur, qui comporte plusieurs chansosn de differentes artistes. 
+
 **Visualisation**
 
-Dans 
+Afin d'analyser la repartition des types d'albums, nous avons preferé d'utiliser un barplot, qui correspond bien a notre besoin.
 
-Affichage du graphique 1
+Affichage du graphique 1 : 
+
 ```{r message=FALSE, warning=FALSE}
 ggplot(dataset, aes(y = Album_type, fill = Album_type)) +
-  geom_histogram(stat = "count")
+  geom_histogram(stat = "count") + 
+  labs(title = "Repartition des types d'Album", x="Frequence", y = "Type d'Album") +
+  theme_minimal()
 ```
+
 **Observations diverses**
+
+D'apres le graphique 1, nous pouvons constater que la presence des albums est plus importante que celle des singles et des compilations. Cela peut etre a cause du fait que les EPs sont considérés comme les Albums, car ils sont composés de 2-4 chansons. Cette separation aurait etait utile, car elle aurait permis de voir si notre dataset suit la tendance actuelle ou pas. Sans cette separation, nous pouvons dire que le dataset ne suit pas la tendance actuelle.
+
+***
 
 ### Question 2 : Y a-t-il une corrélation entre la “danceability” et le tempo ?
 
