@@ -1593,3 +1593,15 @@ En conlusion, même si la méthode de clustering permet de regrouper les chanson
 
 # Conclusion
 
+# Annexes
+
+## Annexe 1 : Répartition du travail au sein du groupe
+
+| *Membre*  | *Travail effectué* |
+| :--: | :-- |
+| Klimentiy | Question 1, question 3, question 5, dashboard shiny et de petites améliorations du rapport (eg. le changement d'ordre des questions) |
+| Alban | Questions 2, 4, 8 et 9. J'ai également ajouté la génération des images en png/fond transparent pour les slides (il faudra installer `orca` pour que ça fonctionne sur certains graphiques). J'ai rédigé les conlusions des parties 1 et 2 et fait quelques améliorations sur le rapport (en plus de corriger les fautes d'orthographe). |
+| Thomas | |
+| Paul | |
+
+Pour ce qui est de la présentation (notamment les slides), nous avons tous participé à leur création.
