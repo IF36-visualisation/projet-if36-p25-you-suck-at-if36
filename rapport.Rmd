@@ -1632,7 +1632,7 @@ J'ai beaucoup appris de ce projet, notamment sur le choix des visualisations, qu
 Le projet m'a permis de trouver un cas d'application pratique *(autre que faire un graphique pour faire un graphique)* où le choix de visualisation est vraiment important. Je trouve dommage que le dataset contienne de données aussi peu interpétable et j'aurais sans douté aimé recommencer la même analyse avec des données différentes/un dataset différent.
 
 ### Thomas
-
+Ce projet m’a donné l'occasion analyser les données de manière critique, notamment en identifiant les limites des features utilisées et les biais présents dans le dataset. J’aurais aimé aller plus loin en explorant des approches complémentaires, comme l’intégration de données qualitatives ou l’analyse temporelle des performances des chansons. Ce projet m’aura montré l’importance de la qualité des données pour obtenir des résultats pertinents et exploitables.
 
 # Annexes
 
