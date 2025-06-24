@@ -1,5 +1,5 @@
 ---
-title: "Rapport"
+title: "Rapport - You suck at IF36"
 author: "Alban Souchard, Paul Fernandez, Thomas Matamba, Klimentiy Mirek"
 date: "2025-04-23"
 output:
@@ -44,9 +44,7 @@ save_plot <- function() {
 }
 ```
 
-# IF36 \- Proposition
-
-## Introduction
+# Introduction
 
 Dans le cadre du projet pour l’UE IF36, “Visualiser des données”, notre groupe utilisera le jeu de données suivant : “Spotify and Youtube, Statistics for the Top 10 songs of various spotify artists and their yt video”. Ce dataset provient du site kaggle.com, et est fait par Salvatore Rastelli, Marco Sallustio et Marco Guarisco. Le dataset a été publié le 7 février 2023, avec les données provenant de 2 sources : Spotify, Youtube.
 
@@ -90,9 +88,9 @@ Le dataset utilisé est complet et ne devrait pas nécessiter de traitement de d
 * `Url_youtube`  
 * `Description`
 
-## Chargement des Librairies utilisées
+# Chargement des Librairies utilisées
 
-Dans le cadre de ce projet, nous avons utilisé plusieurs bibliotheques, afin d'analyser, traiter et visualiser les données. Les bibliotheques utilisés sont : *ggplot2, scales, readr, dplyr, magrittr, tidyr, boot, forcats* et *fmsb*.
+Dans le cadre de ce projet, nous avons utilisé plusieurs bibliothèques, afin d'analyser, traiter et visualiser les données. Les bibliothèques utilisées sont : *ggplot2, scales, readr, dplyr, magrittr, tidyr, boot, forcats* et *fmsb*.
 
 ```{r libraries, echo=TRUE, warning=FALSE}
 library(ggplot2)
@@ -106,21 +104,25 @@ library(forcats)
 library(fmsb)
 ```
 
-## Chargement du dataset
+# Chargement du dataset
 
 Le dataset utilisé se trouve dans le repertoire "data" et le fichier est nommé "Spotify_Youtube.csv". Il comporte toutes les données utilisés durant le projet.
 
 ```{r dataset, echo=TRUE, message=FALSE, warning=FALSE}
-dataset <- read_csv('/Users/klim/Downloads/Spotify_Youtube.csv');
+dataset <- read_csv('data/Spotify_Youtube.csv');
 
 ## Define theme colors to use for graphs
 theme <- "#63a0e1"
 darktheme <- "#2e7bcf"
 ```
 
-## Analyse detaillée du dataset
+# Analyse detaillée du dataset
 
-L'analyse du dataset est separé en 3 grandes parties : **_Exploration_**, **_Impact sur le success_** et **_Clustering_**. Dans la premiere partie, nous avons effectué plusieurs analyses sur les features d'une chanson, afin de comprendre la distribution des differentes caracteristiques, mais aussi de trouver des correlations existantes entre eux. La deuxieme partie d'analyse se concentre sur la recherche de differentes points, qui influences le succes d'une chanson comparant à une autre. Pour finir ce projet, nous avons essayé de mettre en oeuvre un algorithme de clustering.
+L'analyse du dataset est separée en 3 grandes parties : **_Exploration_**, **_Impact sur le succès_** et **_Clustering_**.
+
+- la première partie détaillera les comportements des features afin de trouver des corrélations entre elles et de comprendre la distribution des différentes caractéristiques
+- la deuxième partie se concentrera sur la recherche des points clés pouvant impacter le succès d'une musique de manière significative
+- dans le dernière partie, nous tenterons de regrouper différentes musiques à l'aide d'algorithmes de clustering
 
 ---
 
@@ -161,7 +163,7 @@ ggplot(dataset, aes(y = Album_type, fill = Album_type)) +
 
 D'apres le graphique 1, nous pouvons constater que la presence des albums est plus importante que celle des singles et des compilations. Cela peut etre a cause du fait que les EPs sont considérés comme les Albums, car ils sont composés de 2-4 chansons. Cette separation aurait etait utile, car elle aurait permis de voir si notre dataset suit la tendance actuelle ou pas. Sans cette separation, nous pouvons dire que le dataset ne suit pas la tendance actuelle.
 
-***
+
 
 ### Question 2 : Quelle est la distribution des émotions (valence) des chansons ?
 
@@ -270,7 +272,7 @@ nrow(youtube_only_dataset)
 
 Il apparait cependant que les musiques présentes uniquement sur Spotify ont tendance à avoir une valence répartie autour de $0,7$ : ce sont donc des musiques relativement joyeuses; là où les musiques présentes exclusivement sur Youtube ont une valence mieux répartie, incluant ainsi plus de musiques plus joyeuses et plus de musiques plus tristes que sur Spotify.
 
-***
+
 
 ### Question 3 : Quelle est la distribution des durées des morceaux ? 
 
@@ -411,7 +413,7 @@ D'après les 4 visualisations ci-dessous, nous avons vu que le dataset present r
 
 Pour le graphique 3, les tonalités les plus presentes sont Do/Ré, Sol et Do. Pour le graphique 4, les tonalités les plus presentes sont Sol et Mi. Ce qui aurait etait pertinent dans l'analyse, c'est d'avoir une la separation entre les gammes majeurs et mineurs egalement.  
 
-***
+
 
 ### Question 4 : Quelle est la tonalité la plus fréquente dans les chansons du dataset ?
 
@@ -508,7 +510,7 @@ La réponse à la question soulevée par le graphique précédent, à savoir *es
 
 En effet, les musiques en La et Sol ont des performances moyennes inférieures mais sont plus nombreuses sur Youtube et Spotify.
 
-***
+
 
 ### Question 5 : Est-ce qu'une tonalité a un effet sur le type de chanson ? 
 
@@ -823,7 +825,7 @@ D'après ces radars charts, nous avons pu regarder les differentes "formes" des 
 
 Cette analyse nous a permis de comprendre que le dataset ne contient pas que des chansons. De plus, cela permet de nous questionner sur comment est ce que les données sont calculés.
 
-***
+
 
 ### Question 6 : Y a-t-il une corrélation entre la “danceability” et le tempo ?
 
@@ -873,9 +875,9 @@ dataset %>% ggplot(aes(x = Tempo)) +
 
 En effet on remarque que la forme est similaire à une gaussienne, avec un maximum vers 100 BPM. Cela peut expliquer la tendance observée précédemment. Il n'y aurait donc pas ou très peu de corrélation entre le tempo et la *danceability*.
 
-***
+---
 
-## Impact sur le succes
+## Impact sur le succès
 
 ### Question 7 : Les chansons live ont-elles tendance à avoir plus de vue sur Youtube que Spotify ?
 
@@ -948,7 +950,7 @@ plot_views
 D'après les boxplots, on constate que les morceaux live ont tendance à avoir plus de vues sur Youtube que sur Spotify. En effet, les médianes des vues Youtubes sont très similaires, mais les morceaux live ont une plus grande amplitude de vues sur Youtube que sur Spotify.
 Cela peut confirmer l'hypothèse selon laquelle les morceaux live sont plus populaires sur Youtube que sur Spotify. Cependant, il est important de noter que le nombre de morceaux live est très faible par rapport au nombre total de morceaux, ce qui peut fausser les résultats. De plus, il est possible que d'autres facteurs influencent le nombre de vues et d'écoutes, tels que la popularité de l'artiste ou la qualité de la vidéo.
 
-***
+
 
 ### Question 8 : Les vidéos officielles ont-elles plus de vues que les autres ?
 
@@ -1130,7 +1132,7 @@ Nous avons constaté différentes choses intéressantes dans ces visualisations:
 * les critères de performance sur Youtube ne sont pas corrélés entre eux de manière égale
 * certaines features semblent corrélées entre elles (par exemple energy/loudness, energy/acousticness, acousticness/loudness)
 
-***
+
 
 ### Question 10 : Quelle est la relation entre la présence d’un contenu sous licence et le nombre de vues ?
 
@@ -1152,7 +1154,7 @@ plot_boxplot(
   scale_x_discrete(labels = c("TRUE" = "Sous licence", "FALSE" = "Non licenciée"))
 ```
 
-***
+
 
 ### Question 11 : Est-ce qu’un compte YouTube officiel est plus populaire qu’un compte fan ?
 
@@ -1210,7 +1212,7 @@ Le boxplot ci-dessus montre la distribution du nombre de Likes pour les comptes 
 On constate que les comptes officiels ont une médiane de Likes plus élevée, ce qui confirme l’hypothèse d’une plus grande popularité.  
 L’échelle logarithmique permet de mieux visualiser la dispersion et les valeurs extrêmes.
 
----
+
 
 ### Question 12 : Quel artiste est le plus populaire au moment du 7 février 2023 ?  
 
@@ -1421,7 +1423,7 @@ Au contraire, on voit que des artistes ayant un fort succès sur YouTube comme C
 
 Cette question est egalement traitée avec un dashboard Shiny, dans lequel il est possible de retrouvé les differentes formation en fonction la plateforme choisie, mais elgament les 2 graphiques.
 
-***
+---
 
 ## Clustering
 
