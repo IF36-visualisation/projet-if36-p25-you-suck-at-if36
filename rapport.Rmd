@@ -403,7 +403,6 @@ ggplot(dataset_question_5, aes(x = "", y = Duration_min)) +
     x = "",
     y = "Durée d'une chanson (en minutes)"
   )
-
 ```
 
 Sur ce graphe, nous pouvons voir que la durée moyenne d'une chanson est de 3min42, ce qui est tres proche de notre hypothese. Cependant, nous pouvons voir qu'il y a beaucoup d'outliers presents. QUelques-uns d'entre eux sont tres loin de la durée moyenne, ce qui peut impacter la moyenne. Afin de mieux voir la repartition des valeurs, nous pouvons utiliser un histogram. Dans ce histogramme, nous n'allons pas considerer des valeurs au-dessus de 10 minutes.
@@ -825,122 +824,122 @@ note_labels <- c(
   "Tonalité inconnue"
 )
 
-max_danceability <- dataset[which.max(dataset$Danceability),]
-max_energy <- dataset[which.max(dataset$Energy),]
-max_speechiness <- dataset[which.max(dataset$Speechiness),]
-max_acousticness <- dataset[which.max(dataset$Acousticness),]
-max_instrumentalness <- dataset[which.max(dataset$Instrumentalness),]
-max_liveness <- dataset[which.max(dataset$Liveness),]
-max_valence <- dataset[which.max(dataset$Valence),]
-max_tempo <- dataset[which.max(dataset$Tempo),]
-max_loudness <- dataset[which.max(dataset$Loudness),]
+max_danceability <- dataset[which.max(dataset$Danceability), ]
+max_energy <- dataset[which.max(dataset$Energy), ]
+max_speechiness <- dataset[which.max(dataset$Speechiness), ]
+max_acousticness <- dataset[which.max(dataset$Acousticness), ]
+max_instrumentalness <- dataset[which.max(dataset$Instrumentalness), ]
+max_liveness <- dataset[which.max(dataset$Liveness), ]
+max_valence <- dataset[which.max(dataset$Valence), ]
+max_tempo <- dataset[which.max(dataset$Tempo), ]
+max_loudness <- dataset[which.max(dataset$Loudness), ]
 
 graphe_max_danceability <- data.frame(
-  valence = max_danceability[1,16],
-  liveness = max_danceability[1,15],
-  instrumentalness = max_danceability[1,14],
-  acousticness = max_danceability[1,13],
-  speechiness = max_danceability[1,12],
-  energy = max_danceability[1,9],
-  danceability = max_danceability[1,8],
-  tempo = (max_danceability[1,17] - min(dataset$Tempo, na.rm = TRUE)) / (max(dataset$Tempo, na.rm = TRUE) - min(dataset$Tempo, na.rm = TRUE)),
-  loudness = (max_danceability[1,11] - min(dataset$Loudness, na.rm = TRUE)) / (max(dataset$Loudness, na.rm = TRUE) - min(dataset$Loudness, na.rm = TRUE))
+  valence = max_danceability[1, 16],
+  liveness = max_danceability[1, 15],
+  instrumentalness = max_danceability[1, 14],
+  acousticness = max_danceability[1, 13],
+  speechiness = max_danceability[1, 12],
+  energy = max_danceability[1, 9],
+  danceability = max_danceability[1, 8],
+  tempo = (max_danceability[1, 17] - min(dataset$Tempo, na.rm = TRUE)) / (max(dataset$Tempo, na.rm = TRUE) - min(dataset$Tempo, na.rm = TRUE)),
+  loudness = (max_danceability[1, 11] - min(dataset$Loudness, na.rm = TRUE)) / (max(dataset$Loudness, na.rm = TRUE) - min(dataset$Loudness, na.rm = TRUE))
 )
 
-graphe_max_loudness  <- data.frame(
-  valence = max_loudness[1,16],
-  liveness = max_loudness[1,15],
-  instrumentalness = max_loudness[1,14],
-  acousticness = max_loudness[1,13],
-  speechiness = max_loudness[1,12],
-  energy = max_loudness[1,9],
-  danceability = max_loudness[1,8],
-  tempo = (max_loudness[1,17] - min(dataset$Tempo, na.rm = TRUE)) / (max(dataset$Tempo, na.rm = TRUE) - min(dataset$Tempo, na.rm = TRUE)),
-  loudness = (max_loudness[1,11] - min(dataset$Loudness, na.rm = TRUE)) / (max(dataset$Loudness, na.rm = TRUE) - min(dataset$Loudness, na.rm = TRUE))
+graphe_max_loudness <- data.frame(
+  valence = max_loudness[1, 16],
+  liveness = max_loudness[1, 15],
+  instrumentalness = max_loudness[1, 14],
+  acousticness = max_loudness[1, 13],
+  speechiness = max_loudness[1, 12],
+  energy = max_loudness[1, 9],
+  danceability = max_loudness[1, 8],
+  tempo = (max_loudness[1, 17] - min(dataset$Tempo, na.rm = TRUE)) / (max(dataset$Tempo, na.rm = TRUE) - min(dataset$Tempo, na.rm = TRUE)),
+  loudness = (max_loudness[1, 11] - min(dataset$Loudness, na.rm = TRUE)) / (max(dataset$Loudness, na.rm = TRUE) - min(dataset$Loudness, na.rm = TRUE))
 )
 
-graphe_max_tempo  <- data.frame(
-  valence = max_tempo[1,16],
-  liveness = max_tempo[1,15],
-  instrumentalness = max_tempo[1,14],
-  acousticness = max_tempo[1,13],
-  speechiness = max_tempo[1,12],
-  energy = max_tempo[1,9],
-  danceability = max_tempo[1,8],
-  tempo = (max_tempo[1,17] - min(dataset$Tempo, na.rm = TRUE)) / (max(dataset$Tempo, na.rm = TRUE) - min(dataset$Tempo, na.rm = TRUE)),
-  loudness = (max_tempo[1,11] - min(dataset$Loudness, na.rm = TRUE)) / (max(dataset$Loudness, na.rm = TRUE) - min(dataset$Loudness, na.rm = TRUE))
+graphe_max_tempo <- data.frame(
+  valence = max_tempo[1, 16],
+  liveness = max_tempo[1, 15],
+  instrumentalness = max_tempo[1, 14],
+  acousticness = max_tempo[1, 13],
+  speechiness = max_tempo[1, 12],
+  energy = max_tempo[1, 9],
+  danceability = max_tempo[1, 8],
+  tempo = (max_tempo[1, 17] - min(dataset$Tempo, na.rm = TRUE)) / (max(dataset$Tempo, na.rm = TRUE) - min(dataset$Tempo, na.rm = TRUE)),
+  loudness = (max_tempo[1, 11] - min(dataset$Loudness, na.rm = TRUE)) / (max(dataset$Loudness, na.rm = TRUE) - min(dataset$Loudness, na.rm = TRUE))
 )
 
 graphe_max_energy <- data.frame(
-  valence = max_energy[1,16],
-  liveness = max_energy[1,15],
-  instrumentalness = max_energy[1,14],
-  acousticness = max_energy[1,13],
-  speechiness = max_energy[1,12],
-  energy = max_energy[1,9],
-  danceability = max_energy[1,8],
-  tempo = (max_energy[1,17] - min(dataset$Tempo, na.rm = TRUE)) / (max(dataset$Tempo, na.rm = TRUE) - min(dataset$Tempo, na.rm = TRUE)),
-  loudness = (max_energy[1,11] - min(dataset$Loudness, na.rm = TRUE)) / (max(dataset$Loudness, na.rm = TRUE) - min(dataset$Loudness, na.rm = TRUE))
+  valence = max_energy[1, 16],
+  liveness = max_energy[1, 15],
+  instrumentalness = max_energy[1, 14],
+  acousticness = max_energy[1, 13],
+  speechiness = max_energy[1, 12],
+  energy = max_energy[1, 9],
+  danceability = max_energy[1, 8],
+  tempo = (max_energy[1, 17] - min(dataset$Tempo, na.rm = TRUE)) / (max(dataset$Tempo, na.rm = TRUE) - min(dataset$Tempo, na.rm = TRUE)),
+  loudness = (max_energy[1, 11] - min(dataset$Loudness, na.rm = TRUE)) / (max(dataset$Loudness, na.rm = TRUE) - min(dataset$Loudness, na.rm = TRUE))
 )
 
 graphe_max_speechiness <- data.frame(
-  valence = max_speechiness[1,16],
-  liveness = max_speechiness[1,15],
-  instrumentalness = max_speechiness[1,14],
-  acousticness = max_speechiness[1,13],
-  speechiness = max_speechiness[1,12],
-  energy = max_speechiness[1,9],
-  danceability = max_speechiness[1,8],
-  tempo = (max_speechiness[1,17] - min(dataset$Tempo, na.rm = TRUE)) / (max(dataset$Tempo, na.rm = TRUE) - min(dataset$Tempo, na.rm = TRUE)),
-  loudness = (max_speechiness[1,11] - min(dataset$Loudness, na.rm = TRUE)) / (max(dataset$Loudness, na.rm = TRUE) - min(dataset$Loudness, na.rm = TRUE))
+  valence = max_speechiness[1, 16],
+  liveness = max_speechiness[1, 15],
+  instrumentalness = max_speechiness[1, 14],
+  acousticness = max_speechiness[1, 13],
+  speechiness = max_speechiness[1, 12],
+  energy = max_speechiness[1, 9],
+  danceability = max_speechiness[1, 8],
+  tempo = (max_speechiness[1, 17] - min(dataset$Tempo, na.rm = TRUE)) / (max(dataset$Tempo, na.rm = TRUE) - min(dataset$Tempo, na.rm = TRUE)),
+  loudness = (max_speechiness[1, 11] - min(dataset$Loudness, na.rm = TRUE)) / (max(dataset$Loudness, na.rm = TRUE) - min(dataset$Loudness, na.rm = TRUE))
 )
 
 graphe_max_acousticness <- data.frame(
-  valence = max_acousticness[1,16],
-  liveness = max_acousticness[1,15],
-  instrumentalness = max_acousticness[1,14],
-  acousticness = max_acousticness[1,13],
-  speechiness = max_acousticness[1,12],
-  energy = max_acousticness[1,9],
-  danceability = max_acousticness[1,8],
-  tempo = (max_acousticness[1,17] - min(dataset$Tempo, na.rm = TRUE)) / (max(dataset$Tempo, na.rm = TRUE) - min(dataset$Tempo, na.rm = TRUE)),
-  loudness = (max_acousticness[1,11] - min(dataset$Loudness, na.rm = TRUE)) / (max(dataset$Loudness, na.rm = TRUE) - min(dataset$Loudness, na.rm = TRUE))
+  valence = max_acousticness[1, 16],
+  liveness = max_acousticness[1, 15],
+  instrumentalness = max_acousticness[1, 14],
+  acousticness = max_acousticness[1, 13],
+  speechiness = max_acousticness[1, 12],
+  energy = max_acousticness[1, 9],
+  danceability = max_acousticness[1, 8],
+  tempo = (max_acousticness[1, 17] - min(dataset$Tempo, na.rm = TRUE)) / (max(dataset$Tempo, na.rm = TRUE) - min(dataset$Tempo, na.rm = TRUE)),
+  loudness = (max_acousticness[1, 11] - min(dataset$Loudness, na.rm = TRUE)) / (max(dataset$Loudness, na.rm = TRUE) - min(dataset$Loudness, na.rm = TRUE))
 )
 
 graphe_max_instrumentalness <- data.frame(
-  valence = max_instrumentalness[1,16],
-  liveness = max_instrumentalness[1,15],
-  instrumentalness = max_instrumentalness[1,14],
-  acousticness = max_instrumentalness[1,13],
-  speechiness = max_instrumentalness[1,12],
-  energy = max_instrumentalness[1,9],
-  danceability = max_instrumentalness[1,8],
-  tempo = (max_instrumentalness[1,17] - min(dataset$Tempo, na.rm = TRUE)) / (max(dataset$Tempo, na.rm = TRUE) - min(dataset$Tempo, na.rm = TRUE)),
-  loudness = (max_instrumentalness[1,11] - min(dataset$Loudness, na.rm = TRUE)) / (max(dataset$Loudness, na.rm = TRUE) - min(dataset$Loudness, na.rm = TRUE))
+  valence = max_instrumentalness[1, 16],
+  liveness = max_instrumentalness[1, 15],
+  instrumentalness = max_instrumentalness[1, 14],
+  acousticness = max_instrumentalness[1, 13],
+  speechiness = max_instrumentalness[1, 12],
+  energy = max_instrumentalness[1, 9],
+  danceability = max_instrumentalness[1, 8],
+  tempo = (max_instrumentalness[1, 17] - min(dataset$Tempo, na.rm = TRUE)) / (max(dataset$Tempo, na.rm = TRUE) - min(dataset$Tempo, na.rm = TRUE)),
+  loudness = (max_instrumentalness[1, 11] - min(dataset$Loudness, na.rm = TRUE)) / (max(dataset$Loudness, na.rm = TRUE) - min(dataset$Loudness, na.rm = TRUE))
 )
 
 graphe_max_liveness <- data.frame(
-  valence = max_liveness[1,16],
-  liveness = max_liveness[1,15],
-  instrumentalness = max_liveness[1,14],
-  acousticness = max_liveness[1,13],
-  speechiness = max_liveness[1,12],
-  energy = max_liveness[1,9],
-  danceability = max_liveness[1,8],
-  tempo = (max_liveness[1,17] - min(dataset$Tempo, na.rm = TRUE)) / (max(dataset$Tempo, na.rm = TRUE) - min(dataset$Tempo, na.rm = TRUE)),
-  loudness = (max_liveness[1,11] - min(dataset$Loudness, na.rm = TRUE)) / (max(dataset$Loudness, na.rm = TRUE) - min(dataset$Loudness, na.rm = TRUE))
+  valence = max_liveness[1, 16],
+  liveness = max_liveness[1, 15],
+  instrumentalness = max_liveness[1, 14],
+  acousticness = max_liveness[1, 13],
+  speechiness = max_liveness[1, 12],
+  energy = max_liveness[1, 9],
+  danceability = max_liveness[1, 8],
+  tempo = (max_liveness[1, 17] - min(dataset$Tempo, na.rm = TRUE)) / (max(dataset$Tempo, na.rm = TRUE) - min(dataset$Tempo, na.rm = TRUE)),
+  loudness = (max_liveness[1, 11] - min(dataset$Loudness, na.rm = TRUE)) / (max(dataset$Loudness, na.rm = TRUE) - min(dataset$Loudness, na.rm = TRUE))
 )
 
-graphe_max_valence  <- data.frame(
-  valence = max_valence[1,16],
-  liveness = max_valence[1,15],
-  instrumentalness = max_valence[1,14],
-  acousticness = max_valence[1,13],
-  speechiness = max_valence[1,12],
-  energy = max_valence[1,9],
-  danceability = max_valence[1,8],
-  tempo = (max_valence[1,17] - min(dataset$Tempo, na.rm = TRUE)) / (max(dataset$Tempo, na.rm = TRUE) - min(dataset$Tempo, na.rm = TRUE)),
-  loudness = (max_valence[1,11] - min(dataset$Loudness, na.rm = TRUE)) / (max(dataset$Loudness, na.rm = TRUE) - min(dataset$Loudness, na.rm = TRUE))
+graphe_max_valence <- data.frame(
+  valence = max_valence[1, 16],
+  liveness = max_valence[1, 15],
+  instrumentalness = max_valence[1, 14],
+  acousticness = max_valence[1, 13],
+  speechiness = max_valence[1, 12],
+  energy = max_valence[1, 9],
+  danceability = max_valence[1, 8],
+  tempo = (max_valence[1, 17] - min(dataset$Tempo, na.rm = TRUE)) / (max(dataset$Tempo, na.rm = TRUE) - min(dataset$Tempo, na.rm = TRUE)),
+  loudness = (max_valence[1, 11] - min(dataset$Loudness, na.rm = TRUE)) / (max(dataset$Loudness, na.rm = TRUE) - min(dataset$Loudness, na.rm = TRUE))
 )
 
 graphe_mean <- data.frame(
@@ -957,12 +956,12 @@ graphe_mean <- data.frame(
 max_min <- data.frame(
   Valence = c(1, 0), Liveness = c(1, 0), Instrumentalness = c(1, 0),
   Acousticness = c(1, 0), Speechiness = c(1, 0), Energy = c(1, 0),
-  Danceability = c(1, 0), Tempo = c(1,0), Loudness = c(1,0)
+  Danceability = c(1, 0), Tempo = c(1, 0), Loudness = c(1, 0)
 )
 max_min_bis <- data.frame(
   valence = c(1, 0), liveness = c(1, 0), instrumentalness = c(1, 0),
   acousticness = c(1, 0), speechiness = c(1, 0), energy = c(1, 0),
-  danceability = c(1, 0), tempo = c(1,0), loudness = c(1,0)
+  danceability = c(1, 0), tempo = c(1, 0), loudness = c(1, 0)
 )
 
 rownames(max_min) <- c("Max", "Min")
@@ -974,9 +973,8 @@ graphe_max_instrumentalness <- rbind(max_min, graphe_max_instrumentalness)
 graphe_max_liveness <- rbind(max_min, graphe_max_liveness)
 graphe_max_valence <- rbind(max_min, graphe_max_valence)
 graphe_max_acousticness <- rbind(max_min, graphe_max_acousticness)
-graphe_max_tempo<- rbind(max_min, graphe_max_tempo)
-graphe_max_loudness<- rbind(max_min, graphe_max_loudness)
-
+graphe_max_tempo <- rbind(max_min, graphe_max_tempo)
+graphe_max_loudness <- rbind(max_min, graphe_max_loudness)
 ```
 
 **Visualisation**
@@ -987,9 +985,9 @@ Apres avoir analysé les caracteristiques moyennes des chansons en fonction de c
 Affichage du graphique 1
 ```{r message=FALSE, warning=FALSE}
 create_beautiful_radarchart <- function(data, color = "#00AFBB",
-                                       vlabels = colnames(data), vlcex = 0.7,
-                                       caxislabels = NULL, title = NULL,
-                                       subtitle = NULL, cex.main = 1, ...) {
+                                        vlabels = colnames(data), vlcex = 0.7,
+                                        caxislabels = NULL, title = NULL,
+                                        subtitle = NULL, cex.main = 1, ...) {
   radarchart(
     data,
     axistype = 1,
@@ -1011,7 +1009,7 @@ create_beautiful_radarchart(
   caxislabels = c(0, 2.5, 5, 7.5, 10),
   color = "#FC4E07",
   title = "Graphique 1 : Les caracteristiques moyennes d'une chanson"
-  )
+)
 ```
 
 Afin d'aller plus loin, nous avons fait des radars chart des differentes chansons, qui ont une caracteristique au niveau max.
@@ -1019,14 +1017,14 @@ Afin d'aller plus loin, nous avons fait des radars chart des differentes chanson
 Affichage du graphique 2
 ```{r message=FALSE, warning=FALSE}
 # Préparer une grille 3x3 pour les 9 graphiques
-par(mfrow = c(3, 3), mar = c(3, 3, 3, 3)) 
+par(mfrow = c(3, 3), mar = c(3, 3, 3, 3))
 
 create_beautiful_radarchart(
   data = graphe_max_danceability,
   caxislabels = c(0, 2.5, 5, 7.5, 10),
   color = "#00AFBB",
-  title = paste("La chanson : ", substr(max_danceability[1,4], 1, 17), "..."),
-  subtitle = paste("Tonalité : ", note_labels[[ max_danceability[1, 10][[1]] +1]]),
+  title = paste("La chanson : ", substr(max_danceability[1, 4], 1, 17), "..."),
+  subtitle = paste("Tonalité : ", note_labels[[max_danceability[1, 10][[1]] + 1]]),
   cex.main = 0.7
 )
 
@@ -1034,8 +1032,8 @@ create_beautiful_radarchart(
   data = graphe_max_energy,
   caxislabels = c(0, 2.5, 5, 7.5, 10),
   color = "#E7B800",
-  title = paste("La chanson : ", substr(max_energy[1,4], 1, 17), "..."),
-  subtitle = paste("Tonalité : ", note_labels[[ max_energy[1, 10][[1]] +1]]),
+  title = paste("La chanson : ", substr(max_energy[1, 4], 1, 17), "..."),
+  subtitle = paste("Tonalité : ", note_labels[[max_energy[1, 10][[1]] + 1]]),
   cex.main = 0.7
 )
 
@@ -1043,8 +1041,8 @@ create_beautiful_radarchart(
   data = graphe_max_speechiness,
   caxislabels = c(0, 2.5, 5, 7.5, 10),
   color = "#FF61C3",
-  title = paste("La chanson : ", substr(max_speechiness[1,4], 1, 17), "..."),
-  subtitle = paste("Tonalité : ", note_labels[[ max_speechiness[1, 10][[1]] +1]]),
+  title = paste("La chanson : ", substr(max_speechiness[1, 4], 1, 17), "..."),
+  subtitle = paste("Tonalité : ", note_labels[[max_speechiness[1, 10][[1]] + 1]]),
   cex.main = 0.7
 )
 
@@ -1052,8 +1050,8 @@ create_beautiful_radarchart(
   data = graphe_max_acousticness,
   caxislabels = c(0, 2.5, 5, 7.5, 10),
   color = "#7CAE00",
-  title = paste("La chanson : ", substr(max_acousticness[1,4], 1, 17), "..."),
-  subtitle = paste("Tonalité : ", note_labels[[ max_acousticness[1, 10][[1]] +1]]),
+  title = paste("La chanson : ", substr(max_acousticness[1, 4], 1, 17), "..."),
+  subtitle = paste("Tonalité : ", note_labels[[max_acousticness[1, 10][[1]] + 1]]),
   cex.main = 0.7
 )
 
@@ -1061,8 +1059,8 @@ create_beautiful_radarchart(
   data = graphe_max_instrumentalness,
   caxislabels = c(0, 2.5, 5, 7.5, 10),
   color = "#619CFF",
-  title = paste("La chanson : ", substr(max_instrumentalness[1,4], 1, 17), "..."),
-  subtitle = paste("Tonalité : ", note_labels[[ max_instrumentalness[1, 10][[1]] +1]]),
+  title = paste("La chanson : ", substr(max_instrumentalness[1, 4], 1, 17), "..."),
+  subtitle = paste("Tonalité : ", note_labels[[max_instrumentalness[1, 10][[1]] + 1]]),
   cex.main = 0.7
 )
 
@@ -1070,8 +1068,8 @@ create_beautiful_radarchart(
   data = graphe_max_liveness,
   caxislabels = c(0, 2.5, 5, 7.5, 10),
   color = "#00C19F",
-  title = paste("La chanson : ", substr(max_liveness[1,4], 1, 17), "..."),
-  subtitle = paste("Tonalité : ", note_labels[[ max_liveness[1, 10][[1]] +1]]),
+  title = paste("La chanson : ", substr(max_liveness[1, 4], 1, 17), "..."),
+  subtitle = paste("Tonalité : ", note_labels[[max_liveness[1, 10][[1]] + 1]]),
   cex.main = 0.7
 )
 
@@ -1079,8 +1077,8 @@ create_beautiful_radarchart(
   data = graphe_max_valence,
   caxislabels = c(0, 2.5, 5, 7.5, 10),
   color = "#C77CFF",
-  title = paste("La chanson : ", substr(max_valence[1,4], 1, 17), "..."),
-  subtitle = paste("Tonalité : ", note_labels[[ max_valence[1, 10][[1]] +1]]),
+  title = paste("La chanson : ", substr(max_valence[1, 4], 1, 17), "..."),
+  subtitle = paste("Tonalité : ", note_labels[[max_valence[1, 10][[1]] + 1]]),
   cex.main = 0.7
 )
 
@@ -1088,8 +1086,8 @@ create_beautiful_radarchart(
   data = graphe_max_tempo,
   caxislabels = c(0, 2.5, 5, 7.5, 10),
   color = "#F8766D",
-  title = paste("La chanson : ", substr(max_tempo[1,4], 1, 17), "..."),
-  subtitle = paste("Tonalité : ", note_labels[[ max_tempo[1, 10][[1]] +1]]),
+  title = paste("La chanson : ", substr(max_tempo[1, 4], 1, 17), "..."),
+  subtitle = paste("Tonalité : ", note_labels[[max_tempo[1, 10][[1]] + 1]]),
   cex.main = 0.7
 )
 
@@ -1097,11 +1095,10 @@ create_beautiful_radarchart(
   data = graphe_max_loudness,
   caxislabels = c(0, 2.5, 5, 7.5, 10),
   color = "#FFB000",
-  title = paste("La chanson : ", substr(max_loudness[1,4], 1, 17), "..."),
-  subtitle = paste("Tonalité : ", note_labels[[ max_loudness[1, 10][[1]] +1]]),
+  title = paste("La chanson : ", substr(max_loudness[1, 4], 1, 17), "..."),
+  subtitle = paste("Tonalité : ", note_labels[[max_loudness[1, 10][[1]] + 1]]),
   cex.main = 0.7
 )
-
 ```
 
 
@@ -1368,13 +1365,20 @@ Au contraire, on voit que des artistes ayant un fort succès sur YouTube comme C
 
 ### Question 14 : Peut-on visualiser des clusters de chansons selon leurs caractéristiques avec la t-SNE ?
 
-...
-
 **Hypothèse :**
-...
+Nous cherchons à regrouper les chansons selon leurs caractéristiques musicales (énergie, valence, danceability, etc.) pour voir si des familles musicales cohérentes émergent.
 
 **Traitement des données :**
-...
+Pour ce clustering, nous avons sélectionné les variables numériques suivantes, qui décrivent la structure musicale des morceaux :
+
+- Tempo (battements par minute) : rythme du morceau
+- Valence : score d’émotion positive
+- Liveness : probabilité d’enregistrement live
+- Loudness : volume moyen
+- Danceability : score de dansabilité
+- Key : tonalité (codée en entier)
+- Stream : nombre d’écoutes Spotify (utilisé uniquement pour la description et les tooltips, pas pour le clustering)
+Ces variables ont été choisies car elles permettent de capturer la diversité musicale : rythme, ambiance, tonalité, caractère live ou studio, et potentiel de danse. Nous avons retiré les valeurs manquantes et les doublons pour garantir la qualité de l’analyse. La variable Stream n’a pas été utilisée pour le clustering, car elle reflète la popularité et non la nature musicale du morceau.
 
 **Visualisations : **
 
@@ -1480,3 +1484,11 @@ for (clust in unique(dataset_clustered_nodup$Cluster)) {
   write.csv(tracks, file = paste0("clusters_csv/cluster_", clust, ".csv"), row.names = FALSE, fileEncoding = "UTF-8")
 }
 ```
+
+La méthode (UMAP + DBSCAN) permet de regrouper les chansons en clusters dans l’espace réduit, mais à l’analyse, ces clusters n’ont pas vraiment de sens musical évident. Plusieurs facteurs expliquent ce résultat :
+
+- Qualité discutable de certaines features : Les variables comme valence ou energy sont issues d’algorithmes propriétaires de Spotify et peuvent être calculées de façon peu transparente ou peu fiable. Par exemple, certaines musiques de bruit blanc se retrouvent avec une instrumentalness et une loudness très élevées, ce qui ne correspond pas à une réalité musicale pertinente.
+- Présence d’outliers thématiques : Le dataset contient des objets très atypiques, comme des contes pour enfants en allemand ou des sons expérimentaux, qui faussent la structure des groupes.
+- Clusters peu interprétables : Le tableau récapitulatif des clusters montre des moyennes de features assez proches d’un cluster à l’autre, sans qu’on puisse vraiment identifier des “familles” musicales claires (par exemple : pas de cluster “très dansant”, “très calme”, etc.).
+
+En conlusion, même si la méthode de clustering permet de regrouper les chansons, la pertinence musicale des groupes reste limitée, principalement à cause de la qualité et de l’hétérogénéité des features utilisées. Pour obtenir des clusters plus cohérents, il serait nécessaire d’utiliser des features plus fiables ou de filtrer davantage le dataset pour écarter les cas atypiques.
