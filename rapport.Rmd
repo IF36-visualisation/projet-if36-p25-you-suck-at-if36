@@ -122,33 +122,35 @@ L'analyse du dataset est separée en 3 grandes parties : **_Exploration_**, **_I
 
 - la première partie détaillera les comportements des features afin de trouver des corrélations entre elles et de comprendre la distribution des différentes caractéristiques
 - la deuxième partie se concentrera sur la recherche des points clés pouvant impacter le succès d'une musique de manière significative
-- dans le dernière partie, nous tenterons de regrouper différentes musiques à l'aide d'algorithmes de clustering
+- dans la dernière partie, nous tenterons de regrouper différentes musiques à l'aide d'algorithmes de clustering
 
 ---
 
 ## Exploration
 
-### Question 1 : Quelle est la repartition des types d'album dans le dataset ? 
+Dans cette partie, nous allons chercher des tendances dans les différentes features du dataset et trouver des corrélations entre elles. En d'autres termes, nous allons trouver quelles caractéristiques sont les plus courantes pour les chansons que nous traitons dans le cadre de notre étude. Ces résultats nous permettront peut-être de dégager des tendances, aussi bien au sein de notre dataset que sur les plateformes d'écoute (Spotify et Youtube), qui permettront de mieux comprendre les résultats des parties suivantes.
+
+### Question 1 : Quelle est la répartition des types d'album dans le dataset ? 
 
 L'objectif est de visualiser la fréquence des chansons issues d'albums par rapport aux singles.
 
 **Hypothèses**
 
-Nous pensons, que le nombre des singles doit etre important que celui d'albums. En effet, depuis 2016, le nombre d'albums sorties en en déclin, tandis que le nomrbe des "EPs" et des singles est en augmentation.
+Nous pensons, que le nombre des singles doit être plus important que celui d'albums. En effet, depuis 2016, le nombre d'albums sorties en en déclin, tandis que le nomrbe des "EPs" et des singles est en augmentation.
 
 **Traitement des données**
 
-Avant de pouvoir visualiser cette repartition, il faut s'assurer que le dataset ne comporte pas des types incoherentes, tel que "SinGLES" et "Abums".
+Avant de pouvoir visualiser cette répartition, il faut s'assurer que le dataset ne comporte pas des types incohérents, tel que "SinGLES" et "Abums".
 
 ```{r message=FALSE, warning=FALSE}
 unique(dataset$Album_type)
 ```
 
-D'apres l'affichage ci-dessus, il n'y pas de valeurs incoherentes. Nous pouvons egalement voir que le dataset comporte 3 types d'albums : album, single et compilation. Le type compilation, correspond à un playlist fait par un utilisateur, qui comporte plusieurs chansosn de differentes artistes. 
+D'après l'affichage ci-dessus, il n'y pas de valeurs incohérentes. Nous pouvons également voir que le dataset comporte 3 types d'albums : album, single et compilation. Le type compilation, correspond à un playlist créée par un utilisateur, qui comporte plusieurs chansons de différents artistes. 
 
 **Visualisation**
 
-Afin d'analyser la repartition des types d'albums, nous avons preferé d'utiliser un barplot, qui correspond bien a notre besoin.
+Afin d'analyser la répartition des types d'albums, nous avons preferé utiliser un barplot, qui correspond bien à notre besoin.
 
 Affichage du graphique 1 : 
 
@@ -161,7 +163,7 @@ ggplot(dataset, aes(y = Album_type, fill = Album_type)) +
 
 **Observations diverses**
 
-D'apres le graphique 1, nous pouvons constater que la presence des albums est plus importante que celle des singles et des compilations. Cela peut etre a cause du fait que les EPs sont considérés comme les Albums, car ils sont composés de 2-4 chansons. Cette separation aurait etait utile, car elle aurait permis de voir si notre dataset suit la tendance actuelle ou pas. Sans cette separation, nous pouvons dire que le dataset ne suit pas la tendance actuelle.
+D'après le graphique 1, nous pouvons constater que la présence des albums est plus importante que celle des singles et des compilations. Cela peut être à cause du fait que les EPs sont considérés comme des Albums, car ils sont composés de 2-4 chansons. Cette séparation aurait été utile, car elle aurait permis de voir si notre dataset suit la tendance actuelle ou pas. Sans cette séparation, nous pouvons dire que le dataset ne suit pas la tendance actuelle.
 
 
 
@@ -276,15 +278,15 @@ Il apparait cependant que les musiques présentes uniquement sur Spotify ont ten
 
 ### Question 3 : Quelle est la distribution des durées des morceaux ? 
 
-Nous voulons observer si les morceaux presents dans le dataset suivent une longueur standard.
+Nous voulons observer si les morceaux présents dans le dataset suivent une longueur standard.
 
 **Hypothèses**
 
-D'après une etude en 2019, fait par le media americain Quartz, la durée moyenne d'une chanson est de 3min 30s.
+D'après une étude en 2019, faite par le média américain Quartz, la durée moyenne d'une chanson est de 3min 30s.
 
 **Traitement des données**
 
-Avant de faire des visualisations, nous devons s'assurer qu'il n'y a pas de valeurs nulls dans la colonne Duration_ms. Apres cela, nous allons changer l'unité de durée, passant de ms en minutes, afin de mieux interpreter les valeurs.
+Avant de faire des visualisations, nous devons nous assurer qu'il n'y a pas de valeurs `null` dans la colonne `Duration_ms`. Après cela, nous allons changer l'unité de durée, passant de ms en minutes, afin de mieux interpréter les valeurs.
 
 ```{r message=FALSE, warning=FALSE}
 dataset_question_5 <- dataset %>%
@@ -294,7 +296,7 @@ dataset_question_5 <- dataset %>%
 
 **Visualisation**
 
-Le premier graphe est un boxplot, afin de voir le nombre des outliers presents dans le dataset.
+Le premier graphe est un boxplot, afin de voir le nombre d'outliers présents dans le dataset.
 
 Affichage du graphique 1 : 
 
@@ -313,7 +315,7 @@ ggplot(dataset_question_5, aes(x = "", y = Duration_min)) +
 
 ```
 
-Sur ce graphe, nous pouvons voir que la durée moyenne d'une chanson est de 3min42, ce qui est tres proche de notre hypothese. Cependant, nous pouvons voir qu'il y a beaucoup d'outliers presents. Quelques-uns d'entre eux sont tres loin de la durée moyenne, ce qui peut impacter la moyenne. Afin de mieux voir la repartition des valeurs, nous pouvons utiliser un histogram. Dans ce histogramme, nous n'allons pas considerer des valeurs au-dessus de 10 minutes.
+Sur ce graphe, nous pouvons voir que la durée moyenne d'une chanson est de 3min42, ce qui est très proche de notre hypothèse. Cependant, nous pouvons voir qu'il y a beaucoup d'outliers. Quelques-uns d'entre eux sont très loin de la durée moyenne, ce qui peut impacter la moyenne. Afin de mieux voir la répartition des valeurs, nous pouvons utiliser un histogramme. Dans cet histogramme, nous n'allons pas considérer les valeurs au-dessus de 10 minutes.
 
 Affichage du graphique 2 : 
 
@@ -338,7 +340,7 @@ ggplot(data = dataset_question_5_plot2, aes(x = Duration_min)) +
   )
 ```
 
-Maintenant qu'on a vu la repartition, il serait interessant de voir si les chansons d'une durée entre 3 à 4 minutes ont une tonalité differente de celle des outliers.
+Maintenant qu'on a vu la repartition, il serait intéressant de voir si les chansons d'une durée entre 3 à 4 minutes ont une tonalité différente de celle des outliers.
 
 Affichage du graphique 3 : 
 
@@ -409,9 +411,9 @@ ggplot(dataset_question5_plot4, aes(x = Key, y = n, fill = Key)) +
 
 **Observations diverses**
 
-D'après les 4 visualisations ci-dessous, nous avons vu que le dataset present respecte bien la durée moyenne d'une chanson, malgré la presence de certains outliers. Pour aller plus loin, nous avons regarder la tonalité des chansons d'une durée moyenne, comparant a la tonalité des chansons d'une durée superieur à 10 minutes. 
+D'après les 4 visualisations ci-dessous, nous avons vu que le dataset respecte bien la durée moyenne d'une chanson, malgré la présence de certains outliers. Pour aller plus loin, nous avons regardé la tonalité des chansons d'une durée moyenne, comparée à la tonalité des chansons d'une durée superieure à 10 minutes. 
 
-Pour le graphique 3, les tonalités les plus presentes sont Do/Ré, Sol et Do. Pour le graphique 4, les tonalités les plus presentes sont Sol et Mi. Ce qui aurait etait pertinent dans l'analyse, c'est d'avoir une la separation entre les gammes majeurs et mineurs egalement.  
+Pour le graphique 3, les tonalités les plus presentes sont Do/Ré, Sol et Do. Pour le graphique 4, les tonalités les plus présentes sont Sol et Mi. Ce qui aurait été pertinent dans l'analyse, c'est d'avoir également une séparation entre les gammes majeures et mineures.  
 
 
 
@@ -729,7 +731,7 @@ create_beautiful_radarchart(
 )
 ```
 
-Afin d'aller plus loin, nous avons fait des radars chart des differentes chansons, qui ont une caracteristique au niveau max.
+Afin d'aller plus loin, nous avons fait des radarcharts des différentes chansons, qui ont une caractéristique au niveau maximum.
 
 Affichage du graphique 2 : 
 
@@ -821,7 +823,7 @@ create_beautiful_radarchart(
 
 **Observations diverses**
 
-D'après ces radars charts, nous avons pu regarder les differentes "formes" des chansons. Certains de ces chansons ont des valeurs correctes, tel que "Give it to me", qui a la danceability maximale. Cependant, le morceau "Clean White Noises" a le "instrumentalness" et l'"acousticness" tres haut. Cela est assez surprenant, sachant que les bruits blanches n'ont pas d'instruments acoustiques... De plus, "Teil 7", qui est un recit de sherlock en allemand a le niveau de "speechiness" impressionnant. 
+D'après ces radarcharts, nous avons pu regarder les différentes "formes" des chansons. Certains de ces chansons ont des valeurs correctes, tel que "Give it to me", qui a la danceability maximale. Cependant, le morceau "Clean White Noises" a un "instrumentalness" et une "acousticness" très hauts. Cela est assez surprenant, sachant que les bruits blancs n'ont pas d'instruments acoustiques... De plus, "Teil 7", qui est un récit de sherlock en allemand a un niveau de "speechiness" impressionnant. 
 
 Cette analyse nous a permis de comprendre que le dataset ne contient pas que des chansons. De plus, cela permet de nous questionner sur comment est ce que les données sont calculés.
 
@@ -875,9 +877,23 @@ dataset %>% ggplot(aes(x = Tempo)) +
 
 En effet on remarque que la forme est similaire à une gaussienne, avec un maximum vers 100 BPM. Cela peut expliquer la tendance observée précédemment. Il n'y aurait donc pas ou très peu de corrélation entre le tempo et la *danceability*.
 
+### Conclusion de la partie exploration
+
+Nous avons vu dans cette première partie que :
+
+- contrairement à la tendance, les musiques de notre dataset sont plus tirées d'albums que de singles
+- les musiques sont globalement joyeuses et que le niveau de joyeuseté est plus réparti sur Youtube que sur Spotify
+- les musiques ont une durée moyenne proche des constats d'une étude américaine : 3m30. Cependant il y a certains morceaux qui sont beaucoup plus longs
+- les tonalités sont toutes bien présentes dans notre dataset, à l'exception du Re/Mi qui est beaucoup plus rare. Ceci n'est pas corrélé à un manque de succès de tels morceaux
+- la tonalité ne joue pas sur les caractéristiques d'une chanson
+- il y a peu de corrélation entre la côté dansant d'une chanson et son tempo
+- notre dataset contient autre chose que des musiques : bruit blanc, livre audio, etc
+
 ---
 
 ## Impact sur le succès
+
+Dans cette partie, nous allons tenter de déterminer quelles caractéristiques d'une chanson contribuent à son succès.
 
 ### Question 7 : Les chansons live ont-elles tendance à avoir plus de vue sur Youtube que Spotify ?
 
@@ -1131,6 +1147,7 @@ Nous avons constaté différentes choses intéressantes dans ces visualisations:
 
 * les critères de performance sur Youtube ne sont pas corrélés entre eux de manière égale
 * certaines features semblent corrélées entre elles (par exemple energy/loudness, energy/acousticness, acousticness/loudness)
+* le calcul de la corrélation sur les `Key` ne fonctionne pas correctement. En effet, ce sont des valeurs numériques et la corrélation est donc calculée en ordonnant les tonalités. Pour mieux comprendre l'impact de la tonalité sur le succès, il peut être pertinent de se référer à la fin de la [question 4](#question-4-quelle-est-la-tonalité-la-plus-fréquente-dans-les-chansons-du-dataset).
 
 
 
@@ -1217,6 +1234,7 @@ L’échelle logarithmique permet de mieux visualiser la dispersion et les valeu
 ### Question 12 : Quel artiste est le plus populaire au moment du 7 février 2023 ?  
 
 Nous allons analyser cela selon :
+
 - le nombre de vues sur YouTube
 - le nombre d'écoutes sur Spotify
 - une moyenne combinée des deux plateformes
@@ -1423,9 +1441,22 @@ Au contraire, on voit que des artistes ayant un fort succès sur YouTube comme C
 
 Cette question est egalement traitée avec un dashboard Shiny, dans lequel il est possible de retrouvé les differentes formation en fonction la plateforme choisie, mais elgament les 2 graphiques.
 
+### Conclusion de la partie "Impact sur le succès"
+
+Nous avons vu dans cette deuxième partie que :
+
+- les morceaux lives pourraient être plus populaires sur Youtube que sur Spotify mais le dataset est trop peu fourni pour pouvoir l'affirmer
+- les vidéos officielles (sur youtube) sont plus regardées que les vidéos non officielles
+- les musiques sous licence génèrent plus de vues que les musiques sans licence
+- la publication sur un compte officiel est accompagné de plus de likes que sur un compte non officiel. Il peut être important de faire certifier son compte par les plateformes comme Youtube et Spotify
+- il y a peu de corrélation entre les caractéristiques quantifiables des musiques et leur succès, aussi bien sur Youtube que sur Spotify
+- certains artistes dominent les deux plateformes de streaming musical mais ce n'est pas du tout une tendance générale, certains sont présents quasimment exclusivement sur l'une des deux plateformes
+
 ---
 
 ## Clustering
+
+Dans cette partie, nous allons tenter de trouver des clusters de musiques, de voir si leurs caractéristiques permettent de les regrouper par exemple par genre musical, etc.
 
 ### Question 13 : Peut-on visualiser des clusters de chansons selon leurs caractéristiques avec la t-SNE ?
 
@@ -1558,3 +1589,7 @@ La méthode (UMAP + DBSCAN) permet de regrouper les chansons en clusters dans l�
 - Clusters peu interprétables : Le tableau récapitulatif des clusters montre des moyennes de features assez proches d’un cluster à l’autre, sans qu’on puisse vraiment identifier des “familles” musicales claires (par exemple : pas de cluster “très dansant”, “très calme”, etc.).
 
 En conlusion, même si la méthode de clustering permet de regrouper les chansons, la pertinence musicale des groupes reste limitée, principalement à cause de la qualité et de l’hétérogénéité des features utilisées. Pour obtenir des clusters plus cohérents, il serait nécessaire d’utiliser des features plus fiables ou de filtrer davantage le dataset pour écarter les cas atypiques.
+
+
+# Conclusion
+
