@@ -828,6 +828,7 @@ plot_boxplot(
 ***
 
 ### Question 11 : Est-ce qu'une tonalité a un effet sur le type de chanson ? 
+
 Dans cette question, nous allons examiner les differentes caractéristiques des musiques pour chaque tonalité. Le but est de voir s'il existe une variation des différentes caractéristiques en fonction de la tonalité globale de la chanson.
 
 **Hypothèses**
@@ -1008,13 +1009,13 @@ graphe_max_acousticness <- rbind(max_min, graphe_max_acousticness)
 graphe_max_tempo <- rbind(max_min, graphe_max_tempo)
 graphe_max_loudness <- rbind(max_min, graphe_max_loudness)
 ```
-
 **Visualisation**
 
 Apres avoir analysé les caracteristiques moyennes des chansons en fonction de chaque tonalité, nous nous avions rendu compte  du fait, que les caracteristiques sont d'une meme moyenne pour chaque tonalité. Le radar chart suivant montre les caracteristiques moyennes d'une chanson. En effet, la tonalité ne joue pas sur les caracteristiques d'une chanson.
 
 
-Affichage du graphique 1
+Affichage du graphique 1 : 
+
 ```{r message=FALSE, warning=FALSE}
 create_beautiful_radarchart <- function(data, color = "#00AFBB",
                                         vlabels = colnames(data), vlcex = 0.7,
@@ -1046,7 +1047,8 @@ create_beautiful_radarchart(
 
 Afin d'aller plus loin, nous avons fait des radars chart des differentes chansons, qui ont une caracteristique au niveau max.
 
-Affichage du graphique 2
+Affichage du graphique 2 : 
+
 ```{r message=FALSE, warning=FALSE}
 # Préparer une grille 3x3 pour les 9 graphiques
 par(mfrow = c(3, 3), mar = c(3, 3, 3, 3))
@@ -1132,7 +1134,6 @@ create_beautiful_radarchart(
   cex.main = 0.7
 )
 ```
-
 
 **Observations diverses**
 
