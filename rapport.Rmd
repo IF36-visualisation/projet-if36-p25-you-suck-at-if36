@@ -151,7 +151,7 @@ Affichage du graphique 1 :
 ```{r message=FALSE, warning=FALSE}
 ggplot(dataset, aes(y = Album_type, fill = Album_type)) +
   geom_histogram(stat = "count") + 
-  labs(title = "Repartition des types d'Album", x="Frequence", y = "Type d'Album") +
+  labs(title = "Graphique 1 : Repartition des types d'Album", x="Frequence", y = "Type d'Album") +
   theme_minimal()
 ```
 
@@ -396,15 +396,14 @@ Cela peut confirmer l'hypothèse selon laquelle les morceaux live sont plus popu
 
 Nous voulons observer si les morceaux presents dans le dataset suivent une longueur standard.
 
-
 **Hypothèses**
 
 D'après une etude en 2019, fait par le media americain Quartz, la durée moyenne d'une chanson est de 3min 30s.
 
-
 **Traitement des données**
 
 Avant de faire des visualisations, nous devons s'assurer qu'il n'y a pas de valeurs nulls dans la colonne Duration_ms. Apres cela, nous allons changer l'unité de durée, passant de ms en minutes, afin de mieux interpreter les valeurs.
+
 ```{r message=FALSE, warning=FALSE}
 dataset_question_5 <- dataset %>%
   filter(!is.na(Duration_ms)) %>%
@@ -414,28 +413,33 @@ dataset_question_5 <- dataset %>%
 **Visualisation**
 
 Le premier graphe est un boxplot, afin de voir le nombre des outliers presents dans le dataset.
+
+Affichage du graphique 1 : 
+
 ```{r message=FALSE, warning=FALSE}
 mean_duree <- mean(dataset_question_5$Duration_min)
 ggplot(dataset_question_5, aes(x = "", y = Duration_min)) +
-  geom_violin(fill = "#69b3a2", color = "black") +
+  geom_violin(fill = darktheme, color = "black") +
   geom_hline(yintercept = mean_duree, linetype = "dashed", color = "red", size = 1) +
   annotate("text", x = 1.2, y = mean_duree + 3.3, label = paste("Moyenne =", round(mean_duree, 2)), color = "red") +
   theme_minimal() +
   labs(
-    title = "Distribution de la durée d'une chanson",
+    title = "Graphique 1 : Distribution de la durée d'une chanson",
     x = "",
     y = "Durée d'une chanson (en minutes)"
   )
+
 ```
 
-Sur ce graphe, nous pouvons voir que la durée moyenne d'une chanson est de 3min42, ce qui est tres proche de notre hypothese. Cependant, nous pouvons voir qu'il y a beaucoup d'outliers presents. QUelques-uns d'entre eux sont tres loin de la durée moyenne, ce qui peut impacter la moyenne. Afin de mieux voir la repartition des valeurs, nous pouvons utiliser un histogram. Dans ce histogramme, nous n'allons pas considerer des valeurs au-dessus de 10 minutes.
+Sur ce graphe, nous pouvons voir que la durée moyenne d'une chanson est de 3min42, ce qui est tres proche de notre hypothese. Cependant, nous pouvons voir qu'il y a beaucoup d'outliers presents. Quelques-uns d'entre eux sont tres loin de la durée moyenne, ce qui peut impacter la moyenne. Afin de mieux voir la repartition des valeurs, nous pouvons utiliser un histogram. Dans ce histogramme, nous n'allons pas considerer des valeurs au-dessus de 10 minutes.
 
+Affichage du graphique 2 : 
 
 ```{r message=FALSE, warning=FALSE}
 dataset_question_5_plot2 <- dataset_question_5 %>% filter(Duration_min < 10)
 
 ggplot(data = dataset_question_5_plot2, aes(x = Duration_min)) +
-  geom_histogram(aes(y = ..density..), bins = 50, fill = "#69b3a2", color = "#e9ecef", alpha = 0.9) +
+  geom_histogram(aes(y = ..density..), bins = 50, fill = darktheme, color = "#e9ecef", alpha = 0.9) +
   stat_function(
     fun = dnorm,
     args = list(mean = mean(dataset_question_5_plot2$Duration_min), sd = sd(dataset_question_5_plot2$Duration_min)),
@@ -453,6 +457,9 @@ ggplot(data = dataset_question_5_plot2, aes(x = Duration_min)) +
 ```
 
 Maintenant qu'on a vu la repartition, il serait interessant de voir si les chansons d'une durée entre 3 à 4 minutes ont une tonalité differente de celle des outliers.
+
+Affichage du graphique 3 : 
+
 ```{r message=FALSE, warning=FALSE}
 dataset_question5_plot3 <- dataset_question_5 %>%
   filter(Duration_min <= 4) %>%
@@ -484,6 +491,8 @@ ggplot(dataset_question5_plot3, aes(x = Key, y = n, fill = Key)) +
   ggtitle("Graphique 3 : Repartition de musiques d'une durée entre 3 à 4 minutes en fonction de la tonalité") +
   labs(x = "Tonalité", y = "Frequence", fill = "Tonalité")
 ```
+
+Affichage du graphique 4 : 
 
 ```{r message=FALSE, warning=FALSE}
 dataset_question5_plot4 <- dataset_question_5 %>%
