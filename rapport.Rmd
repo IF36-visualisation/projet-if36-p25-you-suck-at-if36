@@ -109,8 +109,7 @@ library(fmsb)
 Le dataset utilisé se trouve dans le repertoire "data" et le fichier est nommé "Spotify_Youtube.csv". Il comporte toutes les données utilisés durant le projet.
 
 ```{r dataset, echo=TRUE, message=FALSE, warning=FALSE}
-dataset <- read_csv('data/Spotify_Youtube.csv');
-
+dataset <- read_csv("data/Spotify_Youtube.csv")
 ## Define theme colors to use for graphs
 theme <- "#63a0e1"
 darktheme <- "#2e7bcf"
@@ -156,8 +155,8 @@ Affichage du graphique 1 :
 
 ```{r message=FALSE, warning=FALSE}
 ggplot(dataset, aes(y = Album_type, fill = Album_type)) +
-  geom_histogram(stat = "count") + 
-  labs(title = "Graphique 1 : Repartition des types d'Album", x="Frequence", y = "Type d'Album") +
+  geom_histogram(stat = "count") +
+  labs(title = "Graphique 1 : Repartition des types d'Album", x = "Frequence", y = "Type d'Album") +
   theme_minimal()
 ```
 
@@ -312,7 +311,6 @@ ggplot(dataset_question_5, aes(x = "", y = Duration_min)) +
     x = "",
     y = "Durée d'une chanson (en minutes)"
   )
-
 ```
 
 Sur ce graphe, nous pouvons voir que la durée moyenne d'une chanson est de 3min42, ce qui est très proche de notre hypothèse. Cependant, nous pouvons voir qu'il y a beaucoup d'outliers. Quelques-uns d'entre eux sont très loin de la durée moyenne, ce qui peut impacter la moyenne. Afin de mieux voir la répartition des valeurs, nous pouvons utiliser un histogramme. Dans cet histogramme, nous n'allons pas considérer les valeurs au-dessus de 10 minutes.
@@ -1628,5 +1626,5 @@ Pour ce qui est de la présentation (notamment les slides), nous avons tous part
 | :--: | :------------ |
 | Klimentiy | Question 1, question 3, question 5, dashboard shiny et de petites améliorations du rapport (eg. le changement d'ordre des questions) |
 | Alban | Questions 2, 4, 8 et 9. J'ai également ajouté la génération des images en png/fond transparent pour les slides (il faudra installer `orca` pour que ça fonctionne sur certains graphiques). J'ai rédigé les conlusions des parties 1 et 2 et fait quelques améliorations sur le rapport (en plus de corriger les fautes d'orthographe). J'ai également fait les graphes et dashboards sur Tableau. |
-| Thomas | |
+| Thomas | | Questions 12, 13 et 14. J'ai réalisé l'analyse de l'impact d'un compte officiel sur le succès des vidéos YouTube, exploré les artistes les plus populaires sur Spotify et YouTube, et mis en place le clustering des chansons avec UMAP et DBSCAN. J'ai également contribué à la rédaction des observations et conclusions pour ces analyses.
 | Paul | |
