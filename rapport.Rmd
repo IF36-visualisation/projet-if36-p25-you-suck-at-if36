@@ -1599,10 +1599,13 @@ Cela dit, nous avons pu observer la répartition de plusieurs caractéristiques 
 Pour ce qui est du clustering, nous n'avons pas réussi à regrouper les chansons de manière pertinente. Ceci à cause notamment de défauts de notre dataset.
 
 ## Pourquoi le dataset est-il difficilement exploitable ?
+
 ### Le calcul des features est opaque :
 Nous ne savons pas comment elles ont été calculées. Nous ont parfois été surpris en écoutant les musiques et nous avons trouvé que la valeur ne correspondait pas toujours à l'audio que nous avions écouté.
+
 ### Le dataset contient des audios qui ne sont pas des musiques :
 Le dataset inclut également des fichiers audios et youtube et spotify qui ne sont pas des musiques mais du bruit blanc ou encore des livres audio. Difficile de mener une étude sur des musiques quand de tels outliers se fondent dans le dataset.
+
 ### Le dataset n'inclut que les "meilleures musiques" des artistes :
 Nous n'avons pas, dans cette étude, une vue assez complète sur paysage musical puisque nous ne nous intéressons qu'aux meilleures musiques des artistes, alors que certaines de leurs autres musiques marchent mieux que les meilleurs musiques d'autres artistes moins populaires. Il aurait été interssant de ne pas restreindre le dataset intial en fixant un nombre de musiques par artiste mais plutôt en fixant un seuil minimal de likes/streams/vues.
 
@@ -1616,6 +1619,20 @@ Pour aller plus loin, plusieurs pistes d'amélioration peuvent être envisagées
 
 En conclusion, ce projet a permis de mettre en lumière des tendances intéressantes et des limites méthodologiques, tout en ouvrant la voie à des analyses plus approfondies et ciblées. Les résultats obtenus constituent une base solide pour mieux comprendre les dynamiques de succès sur Spotify et YouTube, et pour orienter les stratégies des artistes et des producteurs de contenu.
 
+## Conclusions personnelles :
+
+### Klimentiy
+Ce que j’ai retenu, la diversité de la data visualisation. Ce projet m’a permis d’explorer les différentes types de dataviz, et de comprendre comment les mettre en place. Ce que j’aurais aimé de faire en plus, c’est d’analyser les chansons en fonction du style de la chanson.
+
+### Paul
+J'ai beaucoup appris de ce projet, notamment sur le choix des visualisations, qui sont déterminantes pour une bonne compréhension des données. Cependant, j'aurais aimé pouvoir avoir plus de caractéristiques sur les chansons, et surtout comprendre comment elles ont été réalisées.
+
+### Alban
+Le projet m'a permis de trouver un cas d'application pratique *(autre que faire un graphique pour faire un graphique)* où le choix de visualisation est vraiment important. Je trouve dommage que le dataset contienne de données aussi peu interpétable et j'aurais sans douté aimé recommencer la même analyse avec des données différentes/un dataset différent.
+
+### Thomas
+
+
 # Annexes
 
 ## Annexe 1 : Répartition du travail au sein du groupe
@@ -1627,4 +1644,4 @@ Pour ce qui est de la présentation (notamment les slides), nous avons tous part
 | Klimentiy | Question 1, question 3, question 5, dashboard shiny et de petites améliorations du rapport (eg. le changement d'ordre des questions) |
 | Alban | Questions 2, 4, 8 et 9. J'ai également ajouté la génération des images en png/fond transparent pour les slides (il faudra installer `orca` pour que ça fonctionne sur certains graphiques). J'ai rédigé les conlusions des parties 1 et 2 et fait quelques améliorations sur le rapport (en plus de corriger les fautes d'orthographe). J'ai également fait les graphes et dashboards sur Tableau. |
 | Thomas | Questions 12, 13 et 14. J'ai réalisé l'analyse de l'impact d'un compte officiel sur le succès des vidéos YouTube, exploré les artistes les plus populaires sur Spotify et YouTube, et mis en place le clustering des chansons avec UMAP et DBSCAN. J'ai également contribué à la rédaction des observations et conclusions pour ces analyses. |
-| Paul | |
+| Paul | Questions 6, 7, 10 et readme *(proposition du jeu de données)* |
