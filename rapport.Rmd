@@ -1540,7 +1540,7 @@ summary_table <- dataset_clustered_nodup %>%
     Duration = mean(Duration_ms, na.rm = TRUE) / 1000 # en secondes
   )
 
-cat("\nRésumé automatique par cluster :\n\n")
+cat("Résumé automatique par cluster :\n\n")
 print(summary_table)
 
 # 6. Visualisation interactive
@@ -1568,7 +1568,7 @@ plot_ly(
   layout(title = "Clusters DBSCAN sur UMAP (échantillon de 2000 chansons)")
 ```
 
-```{r export_clusters_uri, echo=TRUE, message=FALSE}
+```{r export_clusters_uri, echo=FALSE, message=FALSE}
 # Crée un dossier pour les clusters si besoin
 if (!dir.exists("clusters_csv")) dir.create("clusters_csv")
 
@@ -1593,15 +1593,40 @@ En conlusion, même si la méthode de clustering permet de regrouper les chanson
 
 # Conclusion
 
+La conclusion de notre étude est mitigée : nous avons réussi à faire ressortir quelques tendances mais il semblerait que notre dataset ne soit pas assez complet.
+A l'issue de cette analyse, nous sommes capables de dire avec certitude que les comptes certifiés/officiels et les vidéos officielles/musiques sous licence sont plus populaires, mais n'est ce pas plutôt leur popularité qui a mené à la certification des comptes et à la classification en tant que "vidéo officielle" ? Il est probable que si, même à postériori pour certaines d'entre elles.
+En tout cas, ce sont les seules données qui se détachent vraiment du lot pour expliquer le succès des musiques, donc nous n'avons pas vraiment trouvé de critère pour qu'une musique apparaisse dans le billboard spotify ou dans les tendances musicales de youtube.
+
+Cela dit, nous avons pu observer la répartition de plusieurs caractéristiques des chansons et les corrélations entre elles. Nous avons pu constater qu'elles étaient en accord ou non avec d'autres études précédentes que nous avons pu trouver sur internet.
+Pour ce qui est du clustering, nous n'avons pas réussi à regrouper les chansons de manière pertinente. Ceci à cause notamment de défauts de notre dataset.
+
+## Pourquoi le dataset est-il difficilement exploitable ?
+### Le calcul des features est opaque :
+Nous ne savons pas comment elles ont été calculées. Nous ont parfois été surpris en écoutant les musiques et nous avons trouvé que la valeur ne correspondait pas toujours à l'audio que nous avions écouté.
+### Le dataset contient des audios qui ne sont pas des musiques :
+Le dataset inclut également des fichiers audios et youtube et spotify qui ne sont pas des musiques mais du bruit blanc ou encore des livres audio. Difficile de mener une étude sur des musiques quand de tels outliers se fondent dans le dataset.
+### Le dataset n'inclut que les "meilleures musiques" des artistes :
+Nous n'avons pas, dans cette étude, une vue assez complète sur paysage musical puisque nous ne nous intéressons qu'aux meilleures musiques des artistes, alors que certaines de leurs autres musiques marchent mieux que les meilleurs musiques d'autres artistes moins populaires. Il aurait été interssant de ne pas restreindre le dataset intial en fixant un nombre de musiques par artiste mais plutôt en fixant un seuil minimal de likes/streams/vues.
+
+## Perspectives
+Pour aller plus loin, plusieurs pistes d'amélioration peuvent être envisagées :
+
+- **Amélioration des données :** Utiliser des features plus fiables et pertinentes pour mieux capturer les caractéristiques musicales des chansons.
+- **Filtrage des outliers :** Écarter les objets atypiques pour obtenir des analyses plus cohérentes.
+- **Approches complémentaires :** Explorer d'autres méthodes de clustering ou intégrer des données qualitatives (par exemple, des genres musicaux ou des annotations humaines).
+- **Analyse temporelle :** Étudier l'évolution des performances des chansons sur les deux plateformes pour identifier des tendances ou des cycles de popularité.
+
+En conclusion, ce projet a permis de mettre en lumière des tendances intéressantes et des limites méthodologiques, tout en ouvrant la voie à des analyses plus approfondies et ciblées. Les résultats obtenus constituent une base solide pour mieux comprendre les dynamiques de succès sur Spotify et YouTube, et pour orienter les stratégies des artistes et des producteurs de contenu.
+
 # Annexes
 
 ## Annexe 1 : Répartition du travail au sein du groupe
 
-| *Membre*  | *Travail effectué* |
-| :--: | :-- |
+Pour ce qui est de la présentation (notamment les slides), nous avons tous participé à sa création. Voici la répartition des sujets traités de manière plus individuelle :
+
+| **Membre**  | **Travail effectué** |
+| :--: | :------------ |
 | Klimentiy | Question 1, question 3, question 5, dashboard shiny et de petites améliorations du rapport (eg. le changement d'ordre des questions) |
-| Alban | Questions 2, 4, 8 et 9. J'ai également ajouté la génération des images en png/fond transparent pour les slides (il faudra installer `orca` pour que ça fonctionne sur certains graphiques). J'ai rédigé les conlusions des parties 1 et 2 et fait quelques améliorations sur le rapport (en plus de corriger les fautes d'orthographe). |
+| Alban | Questions 2, 4, 8 et 9. J'ai également ajouté la génération des images en png/fond transparent pour les slides (il faudra installer `orca` pour que ça fonctionne sur certains graphiques). J'ai rédigé les conlusions des parties 1 et 2 et fait quelques améliorations sur le rapport (en plus de corriger les fautes d'orthographe). J'ai également fait les graphes et dashboards sur Tableau. |
 | Thomas | |
 | Paul | |
-
-Pour ce qui est de la présentation (notamment les slides), nous avons tous participé à leur création.
